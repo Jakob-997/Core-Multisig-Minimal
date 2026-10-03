@@ -79,7 +79,9 @@ CD-R is a write-once format and is useful for durable offline storage when store
 
 **Do not fund the wallet until you have tested the backups.** Reopen every signer backup and confirm that each signer can load successfully and contribute a signature to a disposable test PSBT. Confirm that the intended M-of-N threshold can complete a transaction, and confirm that the watch-only wallet derives the same receive addresses. Only after the complete backup and signing workflow has been tested should you use the wallet for real funds.
 
-When you are finished burning and testing the backups, shut the Tails computer down. In a normal non-persistent Tails session, the working files disappear when the machine powers off.
+Bitcoin Core uses a temporary RAM-only working directory while the generator is running. That temporary wallet state is deleted when the launcher exits; the intended wallet copies are the files in `multisig-backups/`.
+
+When you are finished burning and testing the backups, **shut the computer down**. Powering off Tails clears the remaining session state from RAM, permanently removing the temporary wallet data from the computer. Do not reconnect the machine to a network before shutting it down.
 
 ## Audit
 
