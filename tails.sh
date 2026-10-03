@@ -3,14 +3,12 @@ set -e
 
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 state=/dev/shm/core-multisig
-mkdir -p "$state/data" "$state/backups"
+mkdir "$state"
 
-"$here/bitcoind" -datadir="$state/data" -daemonwait -networkactive=0 -listen=0
+export HOME="$state"
+export PATH="$here:$PATH"
+cd "$state"
 
-PATH="$here:$PATH" \
-BITCOIN_DATADIR="$state/data" \
-MULTISIG_BACKUP_DIR="$state/backups" \
+bitcoind -daemonwait -networkactive=0 -listen=0
 python3 "$here/multisig.py"
-
-"$here/bitcoin-cli" -datadir="$state/data" stop
-echo "Backups: $state/backups"
+bitcoin-cli stop
