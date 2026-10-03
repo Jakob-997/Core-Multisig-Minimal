@@ -97,4 +97,10 @@ Bitcoin Core uses a temporary RAM-only working directory while the generator is 
 
 The wallet is fixed to BIP87 native SegWit `wsh(sortedmulti())`. Bitcoin Core generates the keys, descriptors, and wallet backups. No custom cryptography is used.
 
-This project has not received an independent professional security audit.
+The implementation uses the upstream Bitcoin Core multisig wizard work as its primary reference, including Bitcoin Core PR #36325 and the related Core behavior discussed in #35377.
+
+The generator has received AI-assisted code review and safety testing, but it has **not** received an independent professional security audit. If you plan to rely on it for a wallet and that level of review does not satisfy you, having an experienced Bitcoin developer or security reviewer inspect `multisig.py` is strongly recommended.
+
+The generator is intentionally small and delegates the cryptographic and wallet primitives to Bitcoin Core, so an experienced reviewer should be able to inspect the relevant logic relatively quickly. A meaningful audit should still include functional testing of wallet creation, address derivation, backup restoration, PSBT signing, and the intended M-of-N spending threshold.
+
+If you review or audit the multisig generator, sharing the findings would be greatly appreciated. Help funding an independent audit is also welcome.
