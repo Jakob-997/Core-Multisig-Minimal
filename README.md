@@ -77,17 +77,17 @@ Use **Brasero**, included with Tails, to burn each folder to its matching labele
 
 CD-R is a write-once format and is useful for durable offline storage when stored carefully. Keep each private signer disc in a separate secure location.
 
-**Do not fund the wallet until you have fully tested the backups.** Load every signer wallet and make sure each one opens correctly. Confirm that every signer wallet and the watch-only wallet derive the same multisig receive addresses.
+**Do not fund the wallet until you have completed the entire test and backup process. Keep the computer and every backup disc attended from this point until the computer is powered off and the discs are stored.**
 
-Then perform a disposable **test spend**. Try signing the test transaction with every signer wallet so you know every backup can actually sign, and confirm that the intended M-of-N threshold can complete the transaction.
+Burn each signer folder and the watch-only folder to its matching labeled CD-R. Verify every disc can be read and that every wallet backup loads correctly. Confirm that every signer wallet and the watch-only wallet derive the same multisig receive addresses.
 
-Once the test spend has succeeded, the backup discs are ready to store. Put each labeled CD-R in a protective, durable case so the disc is less likely to be scratched, bent, or otherwise damaged. Do not leave the backup discs unattended until each one has been placed in its intended storage location.
+Then perform a disposable **test spend**. Try signing with **every signer wallet** so you know every signer backup works, and confirm that the intended M-of-N threshold can complete the transaction.
 
-Bitcoin Core uses a temporary RAM-only working directory while the generator is running. That temporary wallet state is deleted when the launcher exits; the intended wallet copies are the files in `multisig-backups/`.
+Once the test spend succeeds and every CD-R has been verified, **immediately shut the computer down and remove the Tails USB**. Do not leave the computer unattended before it has been fully powered off.
 
-When you are finished burning, testing, and storing the backups, **shut the computer down**. Powering off Tails clears the remaining session state from RAM, permanently removing the temporary wallet data from the computer. Do not reconnect the machine to a network before shutting it down.
+Put each labeled CD-R in a protective, durable case, then take the discs **directly to their intended storage locations**. Do not leave the backup discs sitting around or unattended at any point in this process.
 
-**Do not leave the computer unattended until it is fully powered off and the Tails USB has been removed.**
+Bitcoin Core uses a temporary RAM-only working directory while the generator is running. Powering off Tails clears the remaining session state from RAM. The intended long-term copies are the verified backup discs.
 
 ## Audit
 
