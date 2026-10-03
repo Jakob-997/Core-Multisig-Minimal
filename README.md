@@ -6,24 +6,28 @@ A small Bitcoin Core M-of-N multisig generator.
 
 Download and verify Tails and Bitcoin Core v32.
 
-On Tails, put the extracted Bitcoin Core folder in your Home folder, then put this whole folder inside it:
+On Tails, put the extracted Bitcoin Core folder in your Home folder. Put the `Core-Multisig-Minimal` folder inside the outer extracted folder, beside the inner Bitcoin Core folder:
 
 ```text
 Home/
-└── bitcoin-32.0/
-    ├── bin/
+└── bitcoin-32.0rc2-x86_64-linux-gnu/
+    ├── bitcoin-32.0rc2/
+    │   └── bin/
     └── Core-Multisig-Minimal/
+        ├── multisig.py
+        └── tails.sh
 ```
 
-For real storage, use a physically air-gapped computer. Remove the Wi-Fi/Bluetooth card and any WWAN/cellular hardware if possible, disconnect Ethernet, and do not reconnect the machine to a network after it has generated or loaded private signer keys. Treat it as permanently offline.
+For real storage, use a physically air-gapped computer. Remove the Wi-Fi/Bluetooth card and any WWAN/cellular hardware if possible, disconnect Ethernet, and never reconnect the machine to a network after it has generated or loaded private signer keys. Treat it as permanently offline.
 
-Open a terminal in `Core-Multisig-Minimal` and run:
+To run it in Tails:
 
-```bash
-sh tails.sh
-```
+1. Right-click `tails.sh` and open its properties.
+2. Enable **Allow executing file as program**.
+3. Close the properties window.
+4. Right-click `tails.sh` again and choose **Run as a Program**.
 
-Enter the multisig you want:
+A Console window opens and asks:
 
 ```text
 M-of-N (example 2-of-3):
@@ -31,7 +35,7 @@ M-of-N (example 2-of-3):
 
 The script creates N signer wallets and 1 watch-only wallet.
 
-The backups appear right inside the helper folder:
+The backups appear in the same helper folder:
 
 ```text
 Core-Multisig-Minimal/
