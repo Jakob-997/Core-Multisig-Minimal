@@ -1,59 +1,50 @@
 # Core Multisig Minimal
 
-A small, auditable Bitcoin Core M-of-N multisig generator.
+A small Bitcoin Core M-of-N multisig generator.
 
-The repository has two program files:
+## Use
 
-- `multisig.py` — the platform-independent multisig generator.
-- `tails.sh` — a tiny Tails launcher.
+Download and verify Tails and Bitcoin Core v32.
 
-The wallet construction is kept separate from the operating-system setup.
-
-## Multisig generator
-
-`multisig.py` asks one question:
+Put this whole folder inside the extracted Bitcoin Core folder:
 
 ```text
-M-of-N (example 2-of-3):
+bitcoin-32.0/
+├── bin/
+└── Core-Multisig-Minimal/
 ```
 
-It expects a running Bitcoin Core instance and `bitcoin-cli` on PATH. It then:
-
-1. Generates N independent keys.
-2. Derives each BIP87 account key at `m/87h/0h/0h`.
-3. Builds `wsh(sortedmulti(M,.../<0;1>/*))`.
-4. Creates one watch-only wallet.
-5. Creates N signer wallets.
-6. Writes each wallet backup under `./multisig-backups/`.
-
-It performs no custom cryptography and contains no Tails-specific paths or setup.
-
-## Tails
-
-For the Tails workflow, place `multisig.py` and `tails.sh` in the verified Bitcoin Core v32 `bin/` directory beside `bitcoind`, `bitcoin-cli`, and `bitcoin-qt`.
-
-Run:
+Boot Tails on the offline computer, open a terminal in `Core-Multisig-Minimal`, and run:
 
 ```bash
 sh tails.sh
 ```
 
-The launcher sets a RAM-backed home directory under `/dev/shm/core-multisig`, puts the local Bitcoin Core binaries on PATH, starts Bitcoin Core with networking disabled, runs the generator, and stops Bitcoin Core.
+Enter the multisig you want:
 
-The backups end up at:
+```text
+M-of-N (example 2-of-3):
+```
+
+The script creates:
+
+- N signer wallets
+- 1 watch-only wallet
+
+The backups are here:
 
 ```text
 /dev/shm/core-multisig/multisig-backups/
 ```
 
-For an M-of-N wallet, burn the N signer folders and the one watch-only folder to N + 1 separately labeled CD-Rs.
+Burn each wallet folder to its matching labeled CD-R, then shut the computer down.
 
-## Audit scope
+## Audit
 
-For wallet-construction review, audit `multisig.py`.
+`multisig.py` is the generic Bitcoin Core multisig generator.
 
-`tails.sh` contains only the Tails-specific runtime setup and can be reviewed separately.
+`tails.sh` is only the small Tails launcher.
 
-The generator intentionally fixes the wallet design to native SegWit BIP87 multisig rather than exposing extra address types, derivation paths, or descriptor options.
+The wallet is fixed to BIP87 native SegWit `wsh(sortedmulti())`. Bitcoin Core generates the keys, descriptors, and wallet backups. No custom cryptography is used.
 
-Before using real funds, test the complete workflow with disposable funds. This project has not received an independent professional security audit.
+This project has not received an independent professional security audit.
