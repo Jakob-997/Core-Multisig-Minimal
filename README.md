@@ -77,11 +77,15 @@ Use **Brasero**, included with Tails, to burn each folder to its matching labele
 
 CD-R is a write-once format and is useful for durable offline storage when stored carefully. Keep each private signer disc in a separate secure location.
 
-**Do not fund the wallet until you have tested the backups.** Reopen every signer backup and confirm that each signer can load successfully and contribute a signature to a disposable test PSBT. Confirm that the intended M-of-N threshold can complete a transaction, and confirm that the watch-only wallet derives the same receive addresses. Only after the complete backup and signing workflow has been tested should you use the wallet for real funds.
+**Do not fund the wallet until you have fully tested the backups.** Load every signer wallet and make sure each one opens correctly. Confirm that every signer wallet and the watch-only wallet derive the same multisig receive addresses.
+
+Then perform a disposable **test spend**. Try signing the test transaction with every signer wallet so you know every backup can actually sign, and confirm that the intended M-of-N threshold can complete the transaction.
+
+Once the test spend has succeeded, the backup discs are ready to store. Put each labeled CD-R in a protective, durable case so the disc is less likely to be scratched, bent, or otherwise damaged. Do not leave the backup discs unattended until each one has been placed in its intended storage location.
 
 Bitcoin Core uses a temporary RAM-only working directory while the generator is running. That temporary wallet state is deleted when the launcher exits; the intended wallet copies are the files in `multisig-backups/`.
 
-When you are finished burning and testing the backups, **shut the computer down**. Powering off Tails clears the remaining session state from RAM, permanently removing the temporary wallet data from the computer. Do not reconnect the machine to a network before shutting it down.
+When you are finished burning, testing, and storing the backups, **shut the computer down**. Powering off Tails clears the remaining session state from RAM, permanently removing the temporary wallet data from the computer. Do not reconnect the machine to a network before shutting it down.
 
 **Do not leave the computer unattended until it is fully powered off and the Tails USB has been removed.**
 
