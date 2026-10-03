@@ -1,61 +1,74 @@
-# Core Multisig Helper
+# Core Multisig Minimal
 
-A deliberately small Bitcoin Core multisig generator.
+A small, auditable Bitcoin Core M-of-N multisig generator.
 
-The helper does one thing: it asks Bitcoin Core to create an M-of-N native SegWit multisig wallet, then writes N signer wallet backups plus one watch-only wallet backup into RAM.
+The repository contains two files:
 
-It does not implement cryptography, transaction construction, signing, CD burning, seed formats, QR codes, or a wallet GUI. Bitcoin Core does the wallet work.
+- `multisig.py` — the platform-independent multisig generator.
+- `tails.sh` — a tiny Tails launcher.
 
-## Guide
+The security-critical wallet construction is kept separate from the operating-system setup.
 
-1. Download and verify Tails and Bitcoin Core v32.
-2. Use a dedicated laptop and physically remove its network card.
-3. Boot Tails.
-4. Put `multisig.py` inside Bitcoin Core's `bin/` directory, beside `bitcoind`, `bitcoin-cli`, and `bitcoin-qt`.
-5. Label N + 1 CD-Rs:
-   - `signer_1` through `signer_N`
-   - `watch_only`
-6. Run `multisig.py` in a terminal.
+## Multisig generator
 
-It asks:
+`multisig.py` asks one question:
 
 ```text
 M-of-N (example 2-of-3):
 ```
 
-7. The backups appear under:
+It then uses Bitcoin Core to:
+
+1. Generate N independent keys.
+2. Derive each BIP87 account key at `m/87h/0h/0h`.
+3. Build `wsh(sortedmulti(M,.../<0;1>/*))`.
+4. Create one watch-only wallet.
+5. Create N signer wallets.
+6. Back up each wallet separately.
+
+It performs no custom cryptography.
+
+The generator expects `bitcoin-cli` to be available. These optional environment variables only describe the surrounding Bitcoin Core instance:
+
+```text
+BITCOIN_CLI
+BITCOIN_DATADIR
+MULTISIG_BACKUP_DIR
+```
+
+Without them, it uses `bitcoin-cli` from PATH, Bitcoin Core's normal datadir, and `./multisig-backups`.
+
+## Tails
+
+For the Tails workflow, place `multisig.py` and `tails.sh` in the verified Bitcoin Core v32 `bin/` directory beside `bitcoind`, `bitcoin-cli`, and `bitcoin-qt`.
+
+Run:
+
+```bash
+sh tails.sh
+```
+
+The launcher:
+
+- starts Bitcoin Core with networking disabled,
+- keeps the Core datadir and wallet backups under `/dev/shm/core-multisig`,
+- runs the generic multisig generator,
+- stops Bitcoin Core when generation finishes.
+
+The backups are written to:
 
 ```text
 /dev/shm/core-multisig/backups/
 ```
 
-Each folder contains one `wallet.dat`. Burn each folder to its matching CD-R.
-
-8. Power the machine off when finished.
-
-Tails clears the RAM-backed working directory on shutdown.
-
-## Using the wallet
-
-Load the watch-only wallet in Bitcoin Core on the online machine to receive funds and create unsigned PSBTs.
-
-For signing, boot the offline machine, load one signer wallet in Bitcoin Core, import the PSBT, verify it, sign it, and save the partially signed PSBT. Repeat with different signer discs until the M-of-N threshold is reached.
-
-## Construction
-
-The generator follows the Bitcoin Core multisig wizard design:
-
-```text
-m/87h/0h/0h
-wsh(sortedmulti(M,[origin]xpub/<0;1>/*,...))
-```
-
-Bitcoin Core generates the keys, derives the BIP87 account keys, checksums and parses the descriptor, imports it, and creates the wallet backups.
+For an M-of-N wallet, burn the N signer folders and the one watch-only folder to N + 1 separately labeled CD-Rs.
 
 ## Audit scope
 
-The trusted helper is intentionally just `multisig.py`.
+For review of the wallet construction itself, audit `multisig.py`.
 
-The code favors readability over minimum line count: descriptive names, straightforward control flow, and no custom cryptography.
+`tails.sh` contains only the Tails-specific runtime setup and can be reviewed separately.
 
-Before using real funds, review that file line by line and test the complete workflow with disposable funds. This project has not received an independent professional security audit.
+The generator intentionally fixes the wallet design to native SegWit BIP87 multisig rather than exposing additional address types, derivation paths, or descriptor options.
+
+Before using real funds, test the complete workflow with disposable funds. This project has not received an independent professional security audit.
