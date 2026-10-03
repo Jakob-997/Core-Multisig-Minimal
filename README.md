@@ -83,6 +83,8 @@ Bitcoin Core uses a temporary RAM-only working directory while the generator is 
 
 When you are finished burning and testing the backups, **shut the computer down**. Powering off Tails clears the remaining session state from RAM, permanently removing the temporary wallet data from the computer. Do not reconnect the machine to a network before shutting it down.
 
+**Do not leave the computer unattended until it is fully powered off and the Tails USB has been removed.**
+
 ## Audit
 
 `multisig.py` is the generic Bitcoin Core multisig generator.
