@@ -6,7 +6,7 @@ The goal is a small, easy-to-audit multisig generator with as little custom wall
 
 ## Use
 
-Download and verify Tails and Bitcoin Core v32. Verify Bitcoin Core's release signatures, and independently verify the trusted signer key fingerprints rather than simply trusting keys that came with the download.
+Before running this, verify the Tails ISO and the Bitcoin Core v32 release. Verify Bitcoin Core's release signatures, and independently verify the trusted signer key fingerprints rather than simply trusting keys that came with the download.
 
 On Tails, put the extracted Bitcoin Core folder in your Home folder. Put the `Core-Multisig-Minimal` folder inside the outer extracted folder, beside the inner Bitcoin Core folder:
 
