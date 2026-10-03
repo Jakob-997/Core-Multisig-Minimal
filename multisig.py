@@ -3,14 +3,6 @@ import json
 import subprocess
 from pathlib import Path
 
-print("Create your M-N Bitcoin Core multisig wallet.")
-print("This creates N signer wallets and one watch-only wallet.")
-print()
-print("Before continuing, use a verified Bitcoin Core release: verify the release signatures")
-print("and independently verify the signer key fingerprints you trust.")
-print()
-print("If this will be a wallet you actually use, permanently air-gap this computer:")
-print("remove its network card(s) and never connect it to a network again.")
 threshold, signer_count = map(
     int, input("Enter M-N (example 2-3): ").split("-")
 )
@@ -66,14 +58,4 @@ for wallet in wallets:
         check=True,
     )
 
-print()
-print("Finished.")
-print(f"Backups are in: {backup_dir}")
-print("Keep this computer and all backup media attended for the rest of the process.")
-print("Burn and verify each labeled CD-R. Confirm every wallet loads and all wallets")
-print("derive the same multisig addresses. Then do a disposable test spend and try")
-print("signing with every signer wallet.")
-print("Once the CDs are verified and the test spend succeeds, immediately power off")
-print("the computer and remove the Tails USB.")
-print("Then put the CD-Rs in protective cases and take them directly to their")
-print("intended storage locations. Do not leave the backup discs unattended.")
+print(f"Done. Backups are in {backup_dir}")
