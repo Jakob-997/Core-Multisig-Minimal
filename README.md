@@ -20,7 +20,7 @@ Home/
         └── tails.sh
 ```
 
-For real storage, use a physically air-gapped computer. Remove the Wi-Fi/Bluetooth card and any WWAN/cellular hardware if possible, disconnect Ethernet, and never reconnect the machine to a network after it has generated or loaded private signer keys. Treat it as permanently offline.
+If this will be a wallet you actually use, permanently air-gap the computer first. Remove its network card(s), including Wi-Fi/Bluetooth and any WWAN/cellular hardware if present, disconnect Ethernet, and never connect the computer to a network again.
 
 To run it in Tails:
 
