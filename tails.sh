@@ -9,21 +9,35 @@ export PATH="$bitcoin_bin:$PATH"
 export HOME="$state"
 cd "$here"
 
-trap 'bitcoin-cli stop >/dev/null 2>&1 || true; rm -rf "$state"' EXIT
+stop_core() {
+    bitcoin-cli stop >/dev/null 2>&1 || true
+    pkill -x bitcoind >/dev/null 2>&1 || true
+    pkill -x bitcoin-qt >/dev/null 2>&1 || true
+}
+
+cleanup() {
+    stop_core
+    rm -rf "$state"
+}
+
+trap cleanup EXIT HUP INT TERM
+
+stop_core
 
 cat <<'EOF'
 Create your M-N Bitcoin Core multisig wallet.
 
 Before continuing:
-- Use a verified Bitcoin Core release. Verify the release signatures and independently
-  verify the signer key fingerprints you trust.
+- Make sure you verified the Tails ISO and the Bitcoin Core release before running this.
+  Verify Bitcoin Core's release signatures and independently verify the signer key
+  fingerprints you trust.
 - If this will be a wallet you actually use, permanently air-gap this computer:
   remove its network card(s) and never connect it to a network again.
 EOF
 
 bitcoind -daemonwait -networkactive=0 -listen=0
 python3 multisig.py
-bitcoin-cli stop
+stop_core
 
 cat <<'EOF'
 
@@ -46,4 +60,6 @@ Keep this computer and all backup media attended for the rest of the process.
 
 The signer backups are not encrypted. Anyone with a signer backup can copy that key.
 Do not leave the computer or backup discs unattended during this process.
+
+Finished. You can now close this window.
 EOF
