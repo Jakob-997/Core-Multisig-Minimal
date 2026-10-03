@@ -14,7 +14,9 @@ bitcoin-32.0/
 └── Core-Multisig-Minimal/
 ```
 
-Boot Tails on the offline computer, open a terminal in `Core-Multisig-Minimal`, and run:
+For real storage, use a physically air-gapped computer. Remove the Wi-Fi/Bluetooth card and any WWAN/cellular hardware if possible, disconnect Ethernet, and do not reconnect the machine to a network after it has generated or loaded private signer keys. Treat it as permanently offline.
+
+Boot Tails on that offline computer, open a terminal in `Core-Multisig-Minimal`, and run:
 
 ```bash
 sh tails.sh
