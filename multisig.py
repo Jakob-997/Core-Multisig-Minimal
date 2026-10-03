@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import os
 import subprocess
 from pathlib import Path
 
@@ -7,15 +8,15 @@ threshold, signer_count = map(
     int, input("M-of-N (example 2-of-3): ").replace("-of-", "-").split("-")
 )
 
-bitcoin_bin = Path(__file__).resolve().parent
-state_dir = Path("/dev/shm/core-multisig")
-data_dir = state_dir / "data"
-backup_dir = state_dir / "backups"
-data_dir.mkdir(parents=True)
-backup_dir.mkdir()
+bitcoin_cli = os.environ.get("BITCOIN_CLI", "bitcoin-cli")
+bitcoin_datadir = os.environ.get("BITCOIN_DATADIR")
+backup_dir = Path(os.environ.get("MULTISIG_BACKUP_DIR", "multisig-backups")).resolve()
+backup_dir.mkdir(parents=True)
 
 def command(*args, wallet=None):
-    cmd = [bitcoin_bin / "bitcoin-cli", f"-datadir={data_dir}"]
+    cmd = [bitcoin_cli]
+    if bitcoin_datadir:
+        cmd.append(f"-datadir={bitcoin_datadir}")
     if wallet:
         cmd.append(f"-rpcwallet={wallet}")
     return cmd + list(args)
@@ -29,14 +30,6 @@ def import_descriptor(wallet, descriptor_body):
     descriptor = f"{descriptor_body}#{checksum}"
     request = json.dumps([{"desc": descriptor, "active": True, "timestamp": 0}])
     rpc("importdescriptors", request, wallet=wallet)
-
-subprocess.run([
-    bitcoin_bin / "bitcoind",
-    f"-datadir={data_dir}",
-    "-daemonwait",
-    "-networkactive=0",
-    "-listen=0",
-], check=True)
 
 keys = []
 for number in range(1, signer_count + 1):
@@ -70,5 +63,4 @@ for wallet in wallets:
         check=True,
     )
 
-subprocess.run(command("stop"), check=True)
 print(f"Done. Backups are in {backup_dir}")
