@@ -1,6 +1,6 @@
 # Core Multisig Minimal
 
-A small Bitcoin Core M-of-N multisig generator.
+A small Bitcoin Core M-N multisig generator.
 
 ## Use
 
@@ -30,7 +30,7 @@ To run it in Tails:
 A Console window opens and asks:
 
 ```text
-M-of-N (example 2-of-3):
+M-N (example 2-3):
 ```
 
 The script creates N signer wallets and 1 watch-only wallet.
