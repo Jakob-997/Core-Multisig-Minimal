@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import json
-import os
 import subprocess
 from pathlib import Path
 
@@ -8,15 +7,11 @@ threshold, signer_count = map(
     int, input("M-of-N (example 2-of-3): ").replace("-of-", "-").split("-")
 )
 
-bitcoin_cli = os.environ.get("BITCOIN_CLI", "bitcoin-cli")
-bitcoin_datadir = os.environ.get("BITCOIN_DATADIR")
-backup_dir = Path(os.environ.get("MULTISIG_BACKUP_DIR", "multisig-backups")).resolve()
-backup_dir.mkdir(parents=True)
+backup_dir = Path("multisig-backups").resolve()
+backup_dir.mkdir()
 
 def command(*args, wallet=None):
-    cmd = [bitcoin_cli]
-    if bitcoin_datadir:
-        cmd.append(f"-datadir={bitcoin_datadir}")
+    cmd = ["bitcoin-cli"]
     if wallet:
         cmd.append(f"-rpcwallet={wallet}")
     return cmd + list(args)
