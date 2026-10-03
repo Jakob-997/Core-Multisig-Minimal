@@ -2,7 +2,7 @@
 
 A small, auditable Bitcoin Core M-of-N multisig generator.
 
-The repository contains two files:
+The repository has two program files:
 
 - `multisig.py` — the platform-independent multisig generator.
 - `tails.sh` — a tiny Tails launcher.
