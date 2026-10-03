@@ -91,9 +91,9 @@ Bitcoin Core uses a temporary RAM-only working directory while the generator is 
 
 ## Audit
 
-`multisig.py` is the generic Bitcoin Core multisig generator.
+`multisig.py` is the generic Bitcoin Core multisig generator. It contains the wallet-construction logic only; Tails-specific safety and operating instructions are kept out of it to make the code easier to audit.
 
-`tails.sh` is only the small Tails launcher.
+`tails.sh` handles the Tails runtime environment, temporary RAM-only Bitcoin Core state, and the user-facing setup, backup, testing, shutdown, and storage instructions.
 
 The wallet is fixed to BIP87 native SegWit `wsh(sortedmulti())`. Bitcoin Core generates the keys, descriptors, and wallet backups. No custom cryptography is used.
 
