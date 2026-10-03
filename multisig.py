@@ -4,7 +4,7 @@ import subprocess
 from pathlib import Path
 
 threshold, signer_count = map(
-    int, input("M-of-N (example 2-of-3): ").replace("-of-", "-").split("-")
+    int, input("M-N (example 2-3): ").split("-")
 )
 
 backup_dir = Path("multisig-backups").resolve()
