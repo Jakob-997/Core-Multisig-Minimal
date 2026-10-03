@@ -3,8 +3,10 @@ import json
 import subprocess
 from pathlib import Path
 
+print("Create your M-N Bitcoin Core multisig wallet.")
+print("This creates N signer wallets and one watch-only wallet.")
 threshold, signer_count = map(
-    int, input("M-N (example 2-3): ").split("-")
+    int, input("Enter M-N (example 2-3): ").split("-")
 )
 
 backup_dir = Path("multisig-backups").resolve()
@@ -58,4 +60,7 @@ for wallet in wallets:
         check=True,
     )
 
-print(f"Done. Backups are in {backup_dir}")
+print()
+print("Finished.")
+print(f"Backups are in: {backup_dir}")
+print("Burn and verify each backup, then shut this computer down to erase the temporary wallet state.")
