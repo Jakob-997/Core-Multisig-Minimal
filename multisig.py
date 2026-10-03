@@ -5,6 +5,9 @@ from pathlib import Path
 
 print("Create your M-N Bitcoin Core multisig wallet.")
 print("This creates N signer wallets and one watch-only wallet.")
+print()
+print("If this will be a wallet you actually use, permanently air-gap this computer:")
+print("remove its network card(s) and never connect it to a network again.")
 threshold, signer_count = map(
     int, input("Enter M-N (example 2-3): ").split("-")
 )
