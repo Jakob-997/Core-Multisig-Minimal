@@ -58,4 +58,3 @@ for wallet in wallets:
         check=True,
     )
 
-print(f"Done. Backups are in {backup_dir}")
