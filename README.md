@@ -1,6 +1,8 @@
 # Core Multisig Minimal
 
-A small Bitcoin Core M-N multisig generator.
+Create an M-N Bitcoin Core multisig wallet with N separate signer wallets and one watch-only wallet. You choose the M-N policy at the start, and Bitcoin Core handles the key generation, BIP87 derivation, multisig descriptor, and wallet backups.
+
+The goal is a small, easy-to-audit multisig generator with as little custom wallet logic as possible.
 
 ## Use
 
