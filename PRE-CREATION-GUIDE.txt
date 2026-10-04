@@ -1,9 +1,16 @@
 PRE-CREATION GUIDE
 
-Read this before creating the wallet.
+Before creating the wallet, confirm all of the following:
 
-When you have finished reading this guide and are ready to create the wallet,
-close this window and return to the Console.
+[ ] I have verified the Tails ISO.
+[ ] I have verified the Bitcoin Core release and the release-signing key fingerprints I trust.
+[ ] I have physically air-gapped this computer by removing its network card(s) and will never connect it to a network again.
+[ ] I have N + 1 blank CD-Rs with me and they are already labeled for each signer and the watch-only wallet.
+[ ] I have protective cases ready for the finished discs.
+[ ] I have enough uninterrupted time to create the wallet, burn and verify every disc, perform a test spend, shut the computer down, and take every disc directly to its storage location without leaving the computer or backups unattended.
+
+When every item above is true and you are ready to create the wallet, close this
+window and return to the Console.
 
 You can reopen these instructions at any time from this project folder:
 PRE-CREATION-GUIDE.txt
