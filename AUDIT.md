@@ -1,5 +1,74 @@
 # CoreVault Audit Log
 
+## Fresh unique-directory launcher re-review — 2026-10-04
+
+This AI-assisted re-review covers the current launcher change introduced in
+[`c168157306a0552a20ee6a526b0dd0c96efdd27e`](https://github.com/Jakob-997/CoreVault/commit/c168157306a0552a20ee6a526b0dd0c96efdd27e).
+
+The exact executable Git blob SHAs for this review are:
+
+- `tails.sh`: `cf5b67dfc69a483aa03d235a87ef6ce81d8bf20f`
+- `multisig.py`: `19f3988e32566f39e46c4feff1807175c17e06d4` — unchanged from the wallet-construction baseline.
+
+### Current trust flow
+
+The user places `CoreVault/` next to the official
+`bitcoin-32.0rc2-x86_64-linux-gnu.tar.gz`. The launcher checks that adjacent
+archive against the pinned official SHA-256:
+
+```text
+0255103718033e6aee15fa944717fc277e047b845bff1e7408af0ea732d8d0c1
+```
+
+Only after that check succeeds does the launcher create a new empty sibling
+directory with `mktemp -d`, using a name of the form:
+
+```text
+bitcoin-32.0rc2-corevault.XXXXXX
+```
+
+The verified archive is extracted directly into that new directory with the
+archive's single top-level directory stripped. The launcher then uses absolute
+paths to `bin/bitcoin-cli` and `bin/bitcoind` inside that fresh extraction.
+Existing extracted Bitcoin Core directories and binaries on `PATH` are never
+selected.
+
+Unlike the previous launcher revision, the extracted Bitcoin Core directory is
+not temporary and is intentionally left beside the archive after the run. Only
+Bitcoin Core's runtime HOME/state remains temporary under `/dev/shm` and is
+removed by cleanup. Wallet backups remain at `CoreVault/multisig-backups`.
+
+This removes the earlier private tarball copy and temporary `/dev/shm` Core
+extraction. The security property retained is the one relevant to the user flow:
+CoreVault never trusts a pre-existing extracted Core directory; it always creates
+and runs a fresh extraction from the pinned archive.
+
+### Review result and limits
+
+The change is small and does not modify wallet construction, descriptor logic,
+key generation, or RPC handling. No new critical, high, or medium severity issue
+was identified in this scoped source review.
+
+The simplification does reintroduce a theoretical time-of-check/time-of-use window
+between hashing the adjacent archive and `tar` opening it. Under CoreVault's
+documented dedicated offline Tails threat model, the host and same-user processes
+are already trusted, so this does not materially change the intended security
+assumptions. An attacker capable of modifying the archive during that interval
+would already represent a compromised creation environment.
+
+A failed extraction can leave behind the newly created uniquely named directory.
+That directory is never reused automatically on a later run, so it cannot become
+a fallback trusted Core installation.
+
+This exact launcher revision still requires an end-to-end Tails retest before the
+next release candidate. The earlier integration and Tails results below apply to
+their recorded historical launcher blobs and should not be read as test coverage
+for this new persistent fresh-directory extraction.
+
+The prior verified-tarball launcher review below is retained as historical review
+context; this section supersedes its temporary-copy and temporary-extraction
+behavior.
+
 ## Verified-tarball launcher re-review — 2026-10-03
 
 This AI-assisted re-review covers the launcher change based on commit
