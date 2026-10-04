@@ -29,7 +29,7 @@ To run it in Tails:
 3. Close the properties window.
 4. Right-click `tails.sh` again and choose **Run as a Program**.
 
-`PRE-CREATION-GUIDE.txt` opens first with the preparation and security instructions. Read it before creating the wallet.
+`PRE-CREATION-GUIDE.txt` opens first with the preparation and security instructions. Read it before creating the wallet, then close it and return to the Console. Both guide files remain in the project folder and can be reopened manually at any time. If Tails has a compatible window-control utility available, the launcher also attempts to maximize the guide window.
 
 The Console then starts Bitcoin Core and asks:
 
