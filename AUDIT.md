@@ -7,7 +7,7 @@ This AI-assisted re-review covers the current launcher change introduced in
 
 The exact executable Git blob SHAs for this review are:
 
-- `tails.sh`: `cf5b67dfc69a483aa03d235a87ef6ce81d8bf20f`
+- `tails.sh`: `1bfa08002fa5935c65bc1aa66a9531f21127405e`
 - `multisig.py`: `19f3988e32566f39e46c4feff1807175c17e06d4` — unchanged from the wallet-construction baseline.
 
 ### Current trust flow
@@ -46,8 +46,10 @@ and runs a fresh extraction from the pinned archive.
 ### Review result and limits
 
 The change is small and does not modify wallet construction, descriptor logic,
-key generation, or RPC handling. No new critical, high, or medium severity issue
-was identified in this scoped source review.
+key generation, or RPC handling. A later cosmetic simplification removed one
+intermediate path variable and two informational `echo` lines without changing
+launcher behavior. No new critical, high, or medium severity issue was identified
+in this scoped source review.
 
 The simplification does reintroduce a theoretical time-of-check/time-of-use window
 between hashing the adjacent archive and `tar` opening it. Under CoreVault's

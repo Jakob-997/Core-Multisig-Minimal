@@ -16,17 +16,13 @@ printf '0255103718033e6aee15fa944717fc277e047b845bff1e7408af0ea732d8d0c1  %s\n' 
 core_dir=$(mktemp -d "$here/../bitcoin-32.0rc2-corevault.XXXXXX")
 tar -xzf "$archive" -C "$core_dir" --strip-components=1 --no-same-owner
 
-bitcoin_bin="$core_dir/bin"
-bitcoin_cli="$bitcoin_bin/bitcoin-cli"
-bitcoind_bin="$bitcoin_bin/bitcoind"
+bitcoin_cli="$core_dir/bin/bitcoin-cli"
+bitcoind_bin="$core_dir/bin/bitcoind"
 
 if [ ! -x "$bitcoin_cli" ] || [ ! -x "$bitcoind_bin" ]; then
     echo "Bitcoin Core v32.0rc2 binaries missing or not executable in the verified extraction."
     exit 1
 fi
-
-echo "Bitcoin Core verified and freshly extracted to:"
-echo "$core_dir"
 
 zenity --text-info \
     --title="Pre-Creation Guide" \
