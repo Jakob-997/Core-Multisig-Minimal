@@ -9,14 +9,19 @@ threshold, signer_count = map(
     int, input("Enter M-N (example 2-3): ").split("-")
 )
 
-def command(*args, wallet=None):
+def command(method, wallet=None):
     cmd = [bitcoin_cli]
     if wallet:
         cmd.append(f"-rpcwallet={wallet}")
-    return cmd + list(args)
+    return cmd + ["-stdin", method]
 
-def rpc(*args, wallet=None):
-    output = subprocess.check_output(command(*args, wallet=wallet), text=True)
+def rpc(method, *args, wallet=None):
+    stdin = "".join(f"{arg}\n" for arg in args)
+    output = subprocess.check_output(
+        command(method, wallet=wallet),
+        input=stdin,
+        text=True,
+    )
     return json.loads(output)
 
 def import_descriptor(wallet, descriptor_body):
