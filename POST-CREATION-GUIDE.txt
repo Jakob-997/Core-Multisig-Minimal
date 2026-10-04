@@ -63,14 +63,37 @@ Keep this computer and all backup media attended for the rest of this process.
    Send a small amount of bitcoin to a receive address that you have independently
    verified on the offline signer.
 
-   Use the online watch-only wallet to create the unsigned test transaction/PSBT.
-   Transfer the unsigned PSBT to the offline signer computer.
+   You can perform the test spend entirely through the Bitcoin Core GUI:
 
-   Before signing, verify the destination address, amount, fee, and transaction
-   details on the OFFLINE computer.
+   - On the ONLINE computer, open Bitcoin-Qt and select the watch_only wallet.
+   - Open the Send tab, enter the destination and small test amount, review the
+     fee and transaction details, then choose "Create Unsigned".
+   - Save the unsigned PSBT to a file and transfer that file to the OFFLINE
+     computer. Keep an unchanged copy of this original unsigned PSBT for testing
+     additional signer backups.
+   - On the OFFLINE computer, open Bitcoin-Qt and load one signer wallet from a
+     writable copy of its CD-R backup.
+   - In Bitcoin-Qt choose "Load PSBT from file...", open the PSBT, independently
+     verify the destination address, amount, fee, and transaction details, then
+     click "Sign Tx".
+   - Click "Save..." and save the resulting partially signed PSBT.
+   - Load the next signer wallet, open the newly saved PSBT with "Load PSBT from
+     file...", verify it again, click "Sign Tx", and save it again.
+   - Continue until M valid signer wallets have signed and Bitcoin Core reports
+     that the transaction is complete.
+   - Transfer the completed PSBT back to the ONLINE computer, load it in
+     Bitcoin-Qt, verify the transaction again, and broadcast it.
 
-   Try signing with every signer wallet so you know every signer disc works, and
-   confirm that the intended M-of-N threshold can complete the transaction.
+   To test every one of N signer backups when N is greater than M, do not rely on
+   adding every signature to the same PSBT after the threshold has already been
+   reached. Start again from the unchanged original unsigned PSBT for any signer
+   that was not part of the completed M-of-N path, confirm that signer can add a
+   signature, and save/check the result. This verifies every signer backup while
+   separately confirming that the intended M-of-N threshold completes a spend.
+
+   NEVER approve a transaction from the online computer's display alone. The
+   destination address, amount, fee, and transaction details must be checked on
+   the OFFLINE computer before each signature.
 
 ONLINE COMPUTER IS UNTRUSTED
 
