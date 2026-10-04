@@ -46,6 +46,7 @@ Before continuing:
 EOF
 
 bitcoind -daemonwait -networkactive=0 -listen=0 -walletdir="$backup_dir"
+printf '\n'
 python3 multisig.py
 
 cleanup
