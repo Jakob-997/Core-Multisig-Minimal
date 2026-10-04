@@ -1,6 +1,92 @@
 # CoreVault Audit Log
 
-## Final review target
+## Verified-tarball launcher re-review — 2026-10-03
+
+This AI-assisted re-review covers the launcher change based on commit
+[`aae2e2a569845aeb62e037517237fe02162f1cc8`](https://github.com/Jakob-997/CoreVault/commit/aae2e2a569845aeb62e037517237fe02162f1cc8).
+The exact executable Git blob SHAs for this review are:
+
+- `tails.sh`: `9a8d639d9f0ba238b2d008502bd3fdc263b67ea7`
+- `multisig.py`: `19f3988e32566f39e46c4feff1807175c17e06d4` — unchanged from the wallet-construction baseline.
+
+### Trust flow and source of the pin
+
+The user places `CoreVault/` alongside the compressed official
+`bitcoin-32.0rc2-x86_64-linux-gnu.tar.gz`. The launcher sets a restrictive umask,
+creates a fresh private directory with `mktemp -d /dev/shm/core-multisig.XXXXXX`,
+and installs cleanup traps before copying or verifying the archive.
+
+The hardcoded SHA-256 is taken from the official
+[v32.0rc2 SHA256SUMS](https://bitcoincore.org/bin/bitcoin-core-32.0/test.rc2/SHA256SUMS):
+
+```text
+0255103718033e6aee15fa944717fc277e047b845bff1e7408af0ea732d8d0c1  bitcoin-32.0rc2-x86_64-linux-gnu.tar.gz
+```
+
+During this review, the official checksum file and archive were downloaded over
+HTTPS and the archive's digest matched this value. This review did not perform
+independent release-signature authentication; the documented operator signature
+and trusted-key-fingerprint verification remains required.
+
+The launcher verifies its private archive copy before extracting that same copy.
+Replacing the original adjacent tarball after verification cannot substitute the
+bytes extracted. Failed copying, hashing, or extraction aborts before Core runs.
+There is no network fetch, configurable digest, or fallback binary location.
+Only absolute paths to `bitcoin-cli` and `bitcoind` inside the fresh extraction
+are used, including version probes, shutdown RPC, and the path passed to the
+unchanged generator. A pre-existing `bitcoin-32.0rc2` directory and Core binaries
+on `PATH` are ignored.
+
+Runtime HOME remains in that private directory. Wallet backups remain at
+`CoreVault/multisig-backups`, outside temporary cleanup. An existing backup
+directory still causes creation to stop rather than overwrite it. After Core
+startup, cleanup retains the existing stop-and-wait behavior before deleting
+temporary runtime state and extracted executables.
+
+### Validation and result
+
+- POSIX shell syntax checked with `dash -n`; ShellCheck passed without findings.
+- Tested on Ubuntu under WSL with the actual hash-matching release archive.
+- Missing/wrong archives, copy failure, checksum-tool failure, extraction failure,
+  missing/non-executable extracted binaries, generator failure, and TERM during
+  copying all exited unsuccessfully and removed their temporary directories.
+- Rejection before verification did not invoke extraction or create backups.
+- An existing backup directory and its sentinel file were preserved.
+- Three successful disposable 2-of-3 creations produced three signer wallets and
+  a watch-only wallet in the CoreVault folder. The generator received the exact
+  fresh `/dev/shm/.../bitcoin-32.0rc2/bin/bitcoin-cli` path; temporary directories
+  were removed and the test daemon exited. Repeated runs used fresh directories.
+- Planted binaries in the adjacent extracted folder and on `PATH` never ran.
+  Replacing the source tarball immediately after successful hashing still allowed
+  creation from the verified private copy.
+- `multisig.py` retains its original Git blob SHA; no wallet-construction changes.
+
+No new unresolved implementation issue was found in this scoped launcher review
+under the trusted-host assumptions below. This does not repeat or extend the
+historical PSBT/restore review and is not an independent professional audit.
+
+### Limits and retained assumptions
+
+The execution tests stubbed Zenity/setsid and global `pkill` to avoid UI and
+unrelated-process side effects; real Core startup, RPCs, wallet creation, shutdown,
+and process-exit checks were exercised. The new flow has not been tested on Tails
+or with optical-media recovery/test spends. The prior Tails guide-display test
+recorded below applies to the previous launcher snapshot.
+
+The host, system utilities, reviewed CoreVault files (including the digest),
+official release, and same-user processes must be trusted. Private permissions
+do not defend against root or hostile processes running as the same user.
+The existing launcher intentionally stops user-owned `bitcoind`/`bitcoin-qt`
+processes by name and waits for all such processes; it is intended for the
+dedicated offline Tails session, not a shared running-node environment.
+
+`/dev/shm` must have space for the archive plus extraction and permit executable
+files. A `noexec` mount fails closed; the launcher does not remount it or use an
+unverified installation. Cleanup traps cannot handle SIGKILL or power loss.
+RAM-backed storage is not protection against host compromise or swap policy;
+the documented non-persistent Tails environment remains an operational condition.
+
+## Previous executable review target (historical)
 
 **Wallet-construction audit baseline:**  
 [`29a65f87f8070cba71458accf3a44a6f7d88b80b`](https://github.com/Jakob-997/CoreVault/commit/29a65f87f8070cba71458accf3a44a6f7d88b80b)
@@ -15,7 +101,9 @@ Executable blob SHAs at that snapshot:
 
 Between the audit baseline and the final executable snapshot, `multisig.py` did not change. The only executable change was to the Tails launcher so the post-creation Zenity guide opens in a fully detached, nonblocking session. That behavior was then tested successfully on Tails. The other changes were documentation and the code of conduct.
 
-A release tag may point to a later commit containing this audit-log update; the executable files should remain identical to the blob SHAs above.
+Those blob SHAs identify the previous snapshot only. The verified-tarball launcher
+review at the top of this file supersedes its launcher selection behavior; the
+wallet-construction baseline remains unchanged.
 
 **Bitcoin Core version reviewed:** `v32.0rc2`  
 **Bitcoin Core commit:**  
@@ -78,14 +166,14 @@ CoreVault now invokes `bitcoin-cli -stdin` and sends RPC parameters over standar
 
 An earlier launcher prepended the adjacent Bitcoin Core directory to `PATH`. This normally selected the intended binary, but still depended on command-name resolution.
 
-The launcher now uses the exact adjacent paths:
+The previous launcher used the exact adjacent paths:
 
 ```text
 ../bitcoin-32.0rc2/bin/bitcoin-cli
 ../bitcoin-32.0rc2/bin/bitcoind
 ```
 
-It also checks that both binaries report Bitcoin Core v32.0rc2 before wallet creation. `multisig.py` receives the exact `bitcoin-cli` path from the launcher.
+It also checked that both binaries report Bitcoin Core v32.0rc2 before wallet creation. This protected path selection but did not authenticate the binary contents. The verified-tarball change reviewed above replaces adjacent-folder trust with a pinned archive digest and fresh extraction. `multisig.py` still receives the exact `bitcoin-cli` path from the launcher.
 
 **Status:** fixed.
 

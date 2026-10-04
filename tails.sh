@@ -1,20 +1,36 @@
 #!/bin/sh
 set -e
 
-here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-bitcoin_bin="$here/../bitcoin-32.0rc2/bin"
+here=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+umask 077
+state=$(mktemp -d /dev/shm/core-multisig.XXXXXX)
+trap 'rm -rf "$state"' EXIT
+trap 'exit 1' HUP INT TERM
+
+# Pin the official Linux x86_64 release; verify the private copy we extract.
+# https://bitcoincore.org/bin/bitcoin-core-32.0/test.rc2/SHA256SUMS
+core_sha256=0255103718033e6aee15fa944717fc277e047b845bff1e7408af0ea732d8d0c1
+cp -- "$here/../bitcoin-32.0rc2-x86_64-linux-gnu.tar.gz" "$state/core.tar.gz"
+if ! printf '%s  %s\n' "$core_sha256" "$state/core.tar.gz" | sha256sum --check --status; then
+    echo "Bitcoin Core tarball SHA-256 mismatch or verification failure. Refusing to run." >&2
+    exit 1
+fi
+tar -xzf "$state/core.tar.gz" -C "$state" --no-same-owner
+rm -- "$state/core.tar.gz"
+
+bitcoin_bin="$state/bitcoin-32.0rc2/bin"
 bitcoin_cli="$bitcoin_bin/bitcoin-cli"
 bitcoind_bin="$bitcoin_bin/bitcoind"
 
-[ -x "$bitcoin_cli" ] && [ -x "$bitcoind_bin" ] || {
-    echo "Bitcoin Core v32.0rc2 binaries not found in the expected folder."
+if [ ! -x "$bitcoin_cli" ] || [ ! -x "$bitcoind_bin" ]; then
+    echo "Bitcoin Core v32.0rc2 binaries missing or not executable in the verified extraction."
     exit 1
-}
+fi
 
 case "$("$bitcoin_cli" -version 2>/dev/null)" in
     *"Bitcoin Core RPC client version v32.0.0rc2"*) ;;
     *)
-        echo "CoreVault requires Bitcoin Core v32.0rc2."
+        echo "Cannot run verified Bitcoin Core v32.0rc2 bitcoin-cli. /dev/shm must allow execution."
         exit 1
         ;;
 esac
@@ -22,7 +38,7 @@ esac
 case "$("$bitcoind_bin" -version 2>/dev/null)" in
     *"Bitcoin Core daemon version v32.0.0rc2"*) ;;
     *)
-        echo "CoreVault requires Bitcoin Core v32.0rc2."
+        echo "Cannot run verified Bitcoin Core v32.0rc2 bitcoind. /dev/shm must allow execution."
         exit 1
         ;;
 esac
@@ -39,7 +55,6 @@ echo "Please read PRE-CREATION-GUIDE.txt in the folder you launched this from be
 backup_dir="$here/multisig-backups"
 
 original_home=$HOME
-state=$(mktemp -d /dev/shm/core-multisig.XXXXXX)
 
 export HOME="$state"
 cd "$here"

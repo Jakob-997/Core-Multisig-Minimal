@@ -21,19 +21,27 @@ Download and verify Tails and Bitcoin Core before creating a wallet.
 >
 > The generator uses the new `addhdkey` and `derivehdkey` wallet RPCs. These RPCs are present in Bitcoin Core v32.0rc2 and absent from v31.0. Until another v32 release candidate or the final v32.0 release has been tested with this project, use v32.0rc2 exactly.
 
-On Tails, extract the Bitcoin Core download into your **Home** folder. Then place the `CoreVault` folder inside that extracted Bitcoin Core folder, next to the inner `bitcoin-32.0rc2` folder:
+On Tails, place the `CoreVault` folder next to the official **Linux x86_64** tarball in your normal, non-persistent **Home** folder. Keep the tarball compressed; no manual extraction is needed:
 
 ```text
 Home/
-└── bitcoin-32.0rc2-x86_64-linux-gnu/
-    ├── bitcoin-32.0rc2/
-    │   └── bin/
-    └── CoreVault/
-        ├── multisig.py
-        ├── tails.sh
-        ├── PRE-CREATION-GUIDE.txt
-        └── POST-CREATION-GUIDE.txt
+├── bitcoin-32.0rc2-x86_64-linux-gnu.tar.gz
+└── CoreVault/
+    ├── multisig.py
+    ├── tails.sh
+    ├── PRE-CREATION-GUIDE.txt
+    └── POST-CREATION-GUIDE.txt
 ```
+
+The launcher copies the tarball into a fresh private directory under `/dev/shm`, checks that copy against the hardcoded SHA-256 from the official [v32.0rc2 SHA256SUMS](https://bitcoincore.org/bin/bitcoin-core-32.0/test.rc2/SHA256SUMS), then extracts that same verified copy. A missing tarball, failed check, or extraction failure stops the launcher before any Core binary runs. It never uses an existing extracted `bitcoin-32.0rc2` folder.
+
+The pinned SHA-256 for `bitcoin-32.0rc2-x86_64-linux-gnu.tar.gz` is:
+
+```text
+0255103718033e6aee15fa944717fc277e047b845bff1e7408af0ea732d8d0c1
+```
+
+This offline check adds protection against using the wrong archive; it does not replace release-signature verification or trust in the reviewed CoreVault launcher and Tails environment. `/dev/shm` needs enough free space for both the archive and extracted release, and must permit execution. If it is mounted `noexec`, the launcher refuses to run; it does not fall back to another Core installation.
 
 To run it in Tails:
 
@@ -50,7 +58,7 @@ The Console then starts Bitcoin Core and asks:
 Enter M-N (example 2-3):
 ```
 
-The script creates N signer wallets and 1 watch-only wallet directly inside `multisig-backups`. Bitcoin Core's separate runtime data is kept in a temporary RAM-backed directory and removed after generation.
+The script creates N signer wallets and 1 watch-only wallet directly inside `CoreVault/multisig-backups`. Bitcoin Core's verified extracted binaries and separate runtime data are kept in the temporary RAM-backed directory and removed after generation. Backups remain in the CoreVault folder.
 
 After generation succeeds, Bitcoin Core is stopped, the temporary runtime directory is removed, and `POST-CREATION-GUIDE.txt` opens independently in a Zenity text window with the backup, verification, test-spend, shutdown, and storage procedure. The Console does not wait for the Zenity window to close; it immediately displays `Complete. You may now close this window.`
 
@@ -96,7 +104,7 @@ The generator is fixed to:
 
 Bitcoin Core generates the keys, descriptors, and wallet databases. No custom cryptography is used.
 
-The launcher uses only the expected adjacent `bitcoin-32.0rc2/bin` directory, verifies that both `bitcoin-cli` and `bitcoind` report v32.0rc2, and passes the exact `bitcoin-cli` path into `multisig.py`. CoreVault does not resolve either Core binary from the user's `PATH`.
+The launcher runs `bitcoin-cli` and `bitcoind` only by absolute paths inside its fresh, hash-verified extraction under `/dev/shm`. It also checks that both report v32.0rc2 and passes that exact `bitcoin-cli` path into `multisig.py`. CoreVault never resolves either Core binary from the user's `PATH` or from a pre-existing extracted folder. The hardcoded archive digest, launcher, system utilities, and operating environment are part of this trust boundary.
 
 `timestamp: 0` is intentional so restoration cannot miss wallet history because of an incorrect offline system clock.
 
