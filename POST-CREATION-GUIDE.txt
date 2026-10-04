@@ -44,7 +44,7 @@ Keep this computer and all backup media attended for the rest of this process.
 
 4. Take ONLY the WATCH ONLY disc to your online computer.
 
-   On your fully synced online Bitcoin Core node, restore/load the watch-only wallet.
+   On your fully synced, unpruned online Bitcoin Core node, restore/load the watch-only wallet.
    Use this wallet to monitor the multisig and to create unsigned transactions/PSBTs.
 
    NEVER put a signer disc into the online computer.
