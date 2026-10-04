@@ -8,6 +8,14 @@ bitcoin_bin=$(find "$here/.." -maxdepth 2 -type d -path '*/bitcoin-*/bin' -print
     exit 1
 }
 
+bitcoin_cli="$bitcoin_bin/bitcoin-cli"
+bitcoind_bin="$bitcoin_bin/bitcoind"
+
+[ -x "$bitcoin_cli" ] && [ -x "$bitcoind_bin" ] || {
+    echo "Required Bitcoin Core binaries not found."
+    exit 1
+}
+
 zenity --text-info \
     --title="Pre-Creation Guide" \
     --filename="$here/PRE-CREATION-GUIDE.txt" \
@@ -22,12 +30,11 @@ backup_dir="$here/multisig-backups"
 original_home=$HOME
 state=$(mktemp -d /dev/shm/core-multisig.XXXXXX)
 
-export PATH="$bitcoin_bin:$PATH"
 export HOME="$state"
 cd "$here"
 
 stop_core() {
-    bitcoin-cli stop >/dev/null 2>&1 || true
+    "$bitcoin_cli" stop >/dev/null 2>&1 || true
     pkill -TERM -x bitcoind >/dev/null 2>&1 || true
     pkill -TERM -x bitcoin-qt >/dev/null 2>&1 || true
 
@@ -47,9 +54,9 @@ trap 'exit 1' HUP INT TERM
 stop_core
 mkdir "$backup_dir"
 
-bitcoind -daemonwait -networkactive=0 -listen=0 -walletdir="$backup_dir"
+"$bitcoind_bin" -daemonwait -networkactive=0 -listen=0 -walletdir="$backup_dir"
 printf '\n'
-python3 multisig.py
+python3 multisig.py "$bitcoin_cli"
 
 cleanup
 trap - EXIT HUP INT TERM
