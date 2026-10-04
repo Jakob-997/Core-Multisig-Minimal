@@ -28,8 +28,12 @@ cd "$here"
 
 stop_core() {
     bitcoin-cli stop >/dev/null 2>&1 || true
-    pkill -x bitcoind >/dev/null 2>&1 || true
-    pkill -x bitcoin-qt >/dev/null 2>&1 || true
+    pkill -TERM -x bitcoind >/dev/null 2>&1 || true
+    pkill -TERM -x bitcoin-qt >/dev/null 2>&1 || true
+
+    while pgrep -x bitcoind >/dev/null 2>&1 || pgrep -x bitcoin-qt >/dev/null 2>&1; do
+        sleep 1
+    done
 }
 
 cleanup() {
