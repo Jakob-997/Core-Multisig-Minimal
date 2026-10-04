@@ -1,0 +1,63 @@
+PRE-CREATION GUIDE
+
+Read this before creating the wallet.
+
+VERIFY YOUR SOFTWARE
+
+Use a verified Tails ISO and a verified Bitcoin Core release.
+
+Verify Bitcoin Core's release signatures, and independently verify the fingerprints
+of the release-signing keys you choose to trust. Do not rely only on keys or
+fingerprints obtained from the same download you are verifying.
+
+PERMANENT AIR GAP
+
+If this will be a wallet you actually use, prepare the computer as a permanently
+air-gapped machine before generating any keys.
+
+Physically remove its network card(s) and other network hardware where practical,
+including Wi-Fi/Bluetooth and WWAN/cellular hardware. Disconnect Ethernet and do
+not connect this computer to a network again after using it for the wallet.
+
+PREPARE THE COMPLETE BACKUP PROCESS FIRST
+
+Decide your M-N policy before starting. For an M-N wallet you will need N signer
+backups plus one watch-only backup.
+
+If you are using CD-Rs, have N + 1 blank discs ready and label them before creating
+the wallet. For a 2-3 wallet, for example:
+
+SIGNER 1 OF 3 — PRIVATE
+SIGNER 2 OF 3 — PRIVATE
+SIGNER 3 OF 3 — PRIVATE
+WATCH ONLY — PUBLIC
+
+Have protective cases ready for the finished discs.
+
+PLAN TO COMPLETE EVERYTHING IN ONE SESSION
+
+Do not start unless you have enough uninterrupted time to complete the entire
+process:
+
+1. Create the wallet.
+2. Burn every signer wallet and the watch-only wallet to its labeled CD-R.
+3. Verify every disc and make sure every wallet loads.
+4. Confirm all signer wallets and the watch-only wallet derive the same multisig
+   receive addresses.
+5. Perform a disposable test spend and try signing with every signer.
+6. Confirm the intended M-of-N threshold completes the transaction.
+7. Immediately shut the computer down and remove the Tails USB.
+8. Put the discs in protective cases and take them directly to their intended
+   storage locations.
+
+Once wallet creation begins, keep the computer and all backup media attended until
+the computer has been powered off and every backup has been placed in its intended
+storage location.
+
+The signer wallets are not encrypted. Anyone who obtains a signer backup can copy
+that signer's private key.
+
+When you are ready, return to the Console and enter your M-N policy in the requested
+format, for example:
+
+2-3
