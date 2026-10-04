@@ -77,7 +77,8 @@ zenity --text-info \
     --title="Post-Creation Guide" \
     --filename="$here/POST-CREATION-GUIDE.txt" \
     --width=800 \
-    --height=700 || true
+    --height=700 \
+    >/dev/null 2>&1 &
 
 echo "Please read POST-CREATION-GUIDE.txt in the folder you launched this from."
 
