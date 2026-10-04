@@ -29,51 +29,7 @@ Bitcoin Core creates N signer wallets and one watch-only wallet directly in `Cor
 
 When generation finishes, the launcher stops Bitcoin Core and removes the temporary binaries and runtime data. It keeps the wallet backups and opens the post-creation guide independently. The console immediately displays `Complete. You may now close this window.`; neither guide needs to be closed for the console to proceed. Both guides can also be reopened from the project folder.
 
-## Why build on CoreVault? A generation-only comparison with Yeti 2.0
-
-CoreVault is intended to replace the **wallet-generation procedure**, not an entire cold-storage guide. Preparation, backup media, recovery, and spending instructions can evolve separately or be adapted from another project. The comparison here concerns the executable creation logic and the controls around it.
-
-Both projects use Bitcoin Core for key generation and Bitcoin operations. The architectural difference is that [Yeti 2.0's creation procedure](https://github.com/bowlarbear/yeti-2.0/blob/main/README.md) is a sequence of shell commands that the operator runs from a guide, while CoreVault puts creation in a small executable generator with a separate launcher.
-
-**We recommend CoreVault's architecture as the foundation for contributors who want a reusable, reviewable Bitcoin Core multisig generator.** It makes the sequence explicit, checks failures in code, and binds execution to a verified Core archive. Those are concrete improvements in generation safety and change control.
-
-### The security advantage of a reviewed procedure
-
-In a manual procedure, the operator must execute the intended blocks in the intended order, preserve shell variables between steps, and interpret the results. CoreVault records those dependencies in one program. Once an exact revision has been reviewed and tested, subsequent users execute that same implementation.
-
-This reduces opportunities to omit, reorder, or incorrectly reconstruct creation steps. It also gives reviewers a stable target: the generator can be inspected, hashed, pinned to a commit, and tested directly. Changes to prose do not silently change the executable procedure.
-
-The benefit comes from **reviewing the code that actually runs**, rather than from automation or a low line count alone. Bitcoin Core similarly keeps its [Guix build](https://github.com/bitcoin/bitcoin/blob/master/contrib/guix/README.md) and [CI](https://github.com/bitcoin/bitcoin/blob/master/ci/README.md) procedures in version-controlled scripts. Review, change control, and provenance are also reflected in [NIST's Secure Software Development Framework](https://csrc.nist.gov/pubs/sp/800/218/final) and [SLSA source requirements](https://slsa.dev/spec/v1.2/source-requirements).
-
-### What the generation code enforces
-
-| Control | CoreVault | Yeti 2.0 creation procedure |
-| --- | --- | --- |
-| **Execution sequence** | One generator records the order and carries state internally | Operator runs successive command blocks and maintains shell state |
-| **Descriptor-import result** | Explicitly aborts when a descriptor reports failure | Import result is displayed for the operator to interpret |
-| **Key and descriptor handling** | Core derives BIP87 account keys; Python reads structured RPC results | Shell pipelines extract and adapt key expressions from default `wpkh` descriptors using `jq`, `grep`, and `sed` |
-| **Binary identity at launch** | Hardcoded archive digest, fresh private extraction, absolute binary paths | Guide instructs the user to verify and extract the release, then invoke that installation |
-| **Descriptor timestamp** | `timestamp: 0` avoids dependence on the creation machine's clock for history coverage | Uses the creation machine's current timestamp |
-| **Change boundary** | Generator, launcher, and operating instructions are separate files | Generation commands are maintained within the operating guide |
-| **Quorum** | User selects M-N without editing construction code | Creation commands specify 3-of-7 |
-
-CoreVault checks subprocess failures and the per-descriptor success result returned by `importdescriptors`. RPC parameters, including private descriptors, travel over standard input through `bitcoin-cli -stdin`, rather than appearing in command-line arguments. Each signer wallet stores its own private key material together with the shared multisig descriptor.
-
-The launcher verifies the private archive copy that it subsequently extracts. It runs only that fresh copy of `bitcoin-cli` and `bitcoind`, keeps runtime state in a private RAM-backed directory, and stops Core before cleanup. An old extracted installation cannot become the generator's dependency by accident. The [verification section](#software-verification) explains the exact trust flow.
-
-These choices concentrate the custom creation logic into a small, testable surface. They do not remove Python, the shell, system utilities, the launcher, or the host from the trusted environment. The launcher needs review alongside the generator.
-
-### Why this is a fair comparison
-
-The assessment applies the same criteria to both creation procedures: reproducibility of execution, failure handling, data transformations, binary selection, and isolation of executable changes. It does not count the length or completeness of either project's recovery documentation as a generation-security advantage, and it does not use unmeasured setup-time estimates.
-
-Yeti's generation commands are public, version-controlled, and reviewable too. Its fixed quorum reduces policy decisions, and its current procedure uses a stable Core release; CoreVault's new HD-key RPCs require v32.0rc2. BIP87 derivation and a configurable quorum are design choices, not evidence of stronger cryptography.
-
-Both designs trust one machine to generate all signer keys. Neither protects the entire key set against a sufficiently compromised creation environment. CoreVault's archive checksum also depends on a trustworthy pinned digest and does not replace release-signature verification.
-
-Within that scope, our judgment is that **CoreVault offers a stronger structure for safe, repeatable generation and focused security review**. That is why we invite developers and reviewers to build on this generator, improve its launcher, and contribute independent tests. It is an architectural case for collaboration, not a claim that comparative exploit resistance has been proved. The [audit log](AUDIT.md) distinguishes reviewed revisions, completed tests, and remaining validation.
-
-### How the project stays small
+## Project structure
 
 CoreVault uses Bitcoin Core's RPC interface and contains no custom cryptography. Bitcoin Core supplies key generation, derivation, descriptor validation, wallet storage, and signing. Each project file has a defined role:
 
@@ -138,3 +94,18 @@ For the descriptor-import behavior in v32.0rc2 discussed in [bitcoin/bitcoin#353
 
 The proposed [Bitcoin Core multisig wizard](https://github.com/bitcoin/bitcoin/pull/36325) served as a structural reference. It is not part of v32.0rc2 or a runtime dependency. CoreVault uses RPCs and descriptor behavior available in the pinned release. The upstream proposals' status and relevance to the reviewed release are documented in the audit log.
 
+## Compared with Yeti 2.0
+
+CoreVault shares [Yeti 2.0's](https://github.com/bowlarbear/yeti-2.0) basic approach: use Bitcoin Core to create multisig wallets on an offline computer. CoreVault exists to make the **generation procedure easier to review and repeat**, while keeping the operating instructions separate.
+
+Yeti presents wallet generation as commands within its guide. CoreVault organizes the same kind of work into three layers:
+
+- **Generator:** a small script containing the wallet-creation procedure.
+- **Operating-system launcher:** startup, verified Bitcoin Core selection, temporary state, and cleanup.
+- **Guides:** preparation, backups, recovery, and everyday use.
+
+This gives reviewers a clear executable procedure to inspect, test, and pin to an exact revision. Users run that procedure consistently instead of reconstructing it from command blocks. Guides and operating-system support can evolve while the reviewed generator stays stable; launcher changes remain a separate security review target.
+
+We consider this a better structure for reusable wallet generation: it makes audits more focused, reduces opportunities for operator mistakes, and makes security-relevant changes easier to identify. Yeti's commands are also public and reviewable; CoreVault's advantage is the separation and repeatability, rather than different cryptography. Both still depend on a trusted creation environment and careful testing.
+
+Yeti's operating guides can complement this generator. Developers can adapt the launcher or improve the documentation without redesigning wallet creation.
