@@ -8,7 +8,12 @@ bitcoin_bin=$(find "$here/.." -maxdepth 2 -type d -path '*/bitcoin-*/bin' -print
     exit 1
 }
 
-zenity --text-info     --title="Pre-Creation Guide"     --filename="$here/PRE-CREATION-GUIDE.txt"     --width=800     --height=700 || true
+zenity --text-info \
+    --title="Pre-Creation Guide" \
+    --filename="$here/PRE-CREATION-GUIDE.txt" \
+    --width=800 \
+    --height=700 \
+    >/dev/null 2>&1 &
 
 echo "Please read PRE-CREATION-GUIDE.txt in the folder you launched this from before creating your wallet, if you have not already done so."
 
@@ -46,7 +51,11 @@ cleanup
 trap - EXIT HUP INT TERM
 export HOME="$original_home"
 
-zenity --text-info     --title="Post-Creation Guide"     --filename="$here/POST-CREATION-GUIDE.txt"     --width=800     --height=700 || true
+zenity --text-info \
+    --title="Post-Creation Guide" \
+    --filename="$here/POST-CREATION-GUIDE.txt" \
+    --width=800 \
+    --height=700 || true
 
 echo "Please read POST-CREATION-GUIDE.txt in the folder you launched this from."
 
