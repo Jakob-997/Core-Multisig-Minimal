@@ -77,7 +77,9 @@ The generator remains unchanged from its recorded review baseline. The launcher 
 
 The architecture is intended to stay stable while the launcher and operating guides improve. The current release-candidate dependency is deliberate: `addhdkey` and `derivehdkey` provide the Core-native key workflow used here. A later release requires testing, not simply a filename change.
 
-An external audit should target an **exact commit**, review both executable files, and test creation, address agreement, restoration, PSBT signing, and the intended signature threshold. Independent reviews, published findings, and help funding an audit are welcome.
+An external audit should target an **exact commit**, review both executable files, and test creation, address agreement, restoration, PSBT signing, and the intended signature threshold.
+
+If you are considering using CoreVault, we strongly encourage an independent review by someone who understands Bitcoin Core wallets, descriptors, multisig, and PSBTs. If you perform an audit, please consider sharing the findings publicly or contacting the project so the results can be incorporated here. Funding or organizing a professional review is also welcome. The security-critical code surface is intentionally small, so a focused expert review should be substantially narrower than auditing a full wallet application.
 
 <details>
 <summary>Technical wallet details</summary>
@@ -120,6 +122,8 @@ CoreVault shares [Yeti 2.0's](https://github.com/bowlarbear/yeti-2.0) foundation
 ### Why the structure is stronger
 
 Yeti places generation commands inside its operating guide. CoreVault separates three responsibilities: the generator creates the wallets, the launcher manages the operating environment, and the guides explain the human procedure. That gives each security-relevant change a clear home.
+
+Calling a command-by-command construction procedure “no code” can be misleading. A sequence of shell commands that derives keys, transforms descriptor material, assembles a multisig descriptor, and imports it into wallets is still an executable procedure with security-relevant logic. The important question is not whether that logic is written as a script or copied line-by-line from a guide, but how clearly it is defined, reviewed, tested, and reproduced. CoreVault accepts that a small amount of project-specific code exists and tries to handle it explicitly: keep it small, isolate responsibilities, pin dependencies, check failures, preserve exact reviewed revisions, and encourage independent audit.
 
 - **One procedure to review and execute.** Reviewers can inspect, test, hash, and pin the generator. Users execute that exact sequence rather than recreate it through successive command blocks and persistent shell variables. This reduces opportunities to omit or reorder steps.
 - **Failure handling is part of the code.** CoreVault stops on RPC failures and explicitly checks whether descriptor imports succeeded. The procedure does not rely solely on the operator noticing and correctly interpreting every returned result.
