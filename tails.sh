@@ -10,13 +10,24 @@ bitcoin_bin=$(find "$here/.." -maxdepth 2 -type d -path '*/bitcoin-*/bin' -print
 
 open_guide() {
     guide="$1"
+    opened=0
+
     if command -v gio >/dev/null 2>&1; then
-        gio open "$guide" || true
+        if gio open "$guide"; then
+            opened=1
+        fi
     elif command -v gnome-text-editor >/dev/null 2>&1; then
         gnome-text-editor "$guide" >/dev/null 2>&1 &
+        opened=1
     else
         echo "Could not open $(basename "$guide") automatically."
         echo "Open it manually from this folder."
+    fi
+
+    if [ "$opened" -eq 1 ] && command -v wmctrl >/dev/null 2>&1; then
+        sleep 1
+        wmctrl -r "$(basename "$guide")" -b add,maximized_vert,maximized_horz \
+            >/dev/null 2>&1 || true
     fi
 }
 
