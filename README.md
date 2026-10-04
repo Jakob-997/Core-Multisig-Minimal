@@ -15,7 +15,7 @@ Read [PRE-CREATION-GUIDE.txt](PRE-CREATION-GUIDE.txt) before starting. It covers
 1. Download CoreVault and the official [Bitcoin Core v32.0rc2 Linux x86_64 archive](https://bitcoincore.org/bin/bitcoin-core-32.0/test.rc2/): `bitcoin-32.0rc2-x86_64-linux-gnu.tar.gz`.
 2. Put the `CoreVault` folder next to the **unextracted archive**. Any parent folder works—Home, Downloads, or another folder.
 3. In the **Tails File Explorer**, open `CoreVault`. Right-click `tails.sh`, choose **Properties**, and enable **Allow executing file as program**. Close Properties, then right-click `tails.sh` again and choose **Run as a Program**.
-4. Enter your policy when prompted. For example, `2-3` creates three signer wallets and requires two signatures to spend.
+4. Enter your policy when prompted. For example, `2-3` creates three signer wallets and requires two signatures to spend. Immediately after you press Enter, the launcher disables NetworkManager networking and confirms it is disabled before verifying or extracting Bitcoin Core or starting wallet creation.
 
 The launcher finds the archive relative to its own folder, so you do not need to extract Bitcoin Core or launch from a particular working directory.
 
@@ -23,7 +23,7 @@ The launcher finds the archive relative to its own folder, so you do not need to
 
 ### What to expect
 
-The launcher checks the archive, creates a brand-new uniquely named Bitcoin Core directory next to it, extracts the verified release there, and starts only that copy with networking disabled. The pre-creation guide opens in a separate window while the console asks for your policy.
+The pre-creation guide opens in a separate window while the console asks for your policy. As soon as you enter the M-of-N policy, the launcher runs `nmcli networking off` and confirms NetworkManager reports networking as disabled. Only then does it check the archive, create a brand-new uniquely named Bitcoin Core directory next to it, extract the verified release there, and start only that copy.
 
 Wallets are written directly to **`CoreVault/multisig-backups`**. Each signer wallet contains that signer's private key material and the shared multisig configuration; the watch-only wallet contains the public configuration.
 
@@ -65,7 +65,7 @@ The pinned digest from the official [SHA256SUMS](https://bitcoincore.org/bin/bit
 0255103718033e6aee15fa944717fc277e047b845bff1e7408af0ea732d8d0c1
 ```
 
-This supplements signature verification and depends on trustworthy CoreVault files, system utilities, and the host. The extraction itself is placed beside the archive in a fresh directory; `/dev/shm` is used only for Bitcoin Core's temporary runtime state.
+This supplements signature verification and depends on trustworthy CoreVault files, system utilities, and the host. The extraction itself is placed beside the archive in a fresh directory; `/dev/shm` is used only for Bitcoin Core's temporary runtime state. The automatic `nmcli networking off` step is defense in depth and does not replace the documented physical air gap.
 
 All signer keys are generated on one machine. Multisig protects against later loss or theft of separately stored backups, but a compromised creation environment can compromise every key. A checksum and an air gap do not remove that assumption.
 

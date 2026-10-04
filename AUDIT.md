@@ -1,5 +1,37 @@
 # CoreVault Audit Log
 
+## Network-disable-before-creation launcher re-review — 2026-10-04
+
+This AI-assisted re-review covers the launcher change that moves the M-of-N prompt
+ahead of Bitcoin Core verification/extraction and adds a fail-closed NetworkManager
+software networking check before any Core extraction or wallet creation.
+
+The exact executable Git blob SHAs for this review are:
+
+- `tails.sh`: `e0adc8da4dcd1d72bad97bf50a8eebb01dd1aa21`
+- `multisig.py`: `19f3988e32566f39e46c4feff1807175c17e06d4` — unchanged from the wallet-construction baseline.
+
+After the user enters the M-of-N policy, the launcher immediately runs
+`nmcli networking off` and then checks `nmcli networking` under the C locale.
+If the command fails or the reported state is not `disabled`, `set -e` / the
+explicit check stops execution. The launcher has not yet created runtime state,
+hashed or extracted Bitcoin Core, started bitcoind, or generated keys at that
+point.
+
+To keep `multisig.py` frozen, the launcher stores the user's policy before
+disabling networking and later supplies that exact line to the existing
+`input()` over standard input. The generator's stdout is redirected only to hide
+the now-redundant prompt; errors remain visible on stderr. No wallet-construction,
+descriptor, derivation, or RPC logic changed.
+
+This is defense in depth rather than a replacement for the documented physical
+air gap. `nmcli networking off` disables networking managed by NetworkManager;
+it is not a claim that every possible radio or hostile host process has been
+neutralized.
+
+This exact launcher revision should receive an end-to-end Tails retest before the
+next release candidate.
+
 ## Fresh unique-directory launcher re-review — 2026-10-04
 
 This AI-assisted re-review covers the current launcher change introduced in

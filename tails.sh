@@ -3,6 +3,25 @@ set -e
 
 here=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 umask 077
+
+zenity --text-info \
+    --title="Pre-Creation Guide" \
+    --filename="$here/PRE-CREATION-GUIDE.txt" \
+    --width=800 \
+    --height=700 \
+    >/dev/null 2>&1 &
+
+echo "Please read PRE-CREATION-GUIDE.txt in the folder you launched this from before creating your wallet, if you have not already done so."
+
+printf 'Enter M-N (example 2-3): '
+IFS= read -r policy
+
+nmcli networking off
+if [ "$(LC_ALL=C nmcli networking)" != "disabled" ]; then
+    echo "Failed to disable networking."
+    exit 1
+fi
+
 state=$(mktemp -d /dev/shm/core-multisig.XXXXXX)
 trap 'rm -rf "$state"' EXIT
 trap 'exit 1' HUP INT TERM
@@ -23,15 +42,6 @@ if [ ! -x "$bitcoin_cli" ] || [ ! -x "$bitcoind_bin" ]; then
     echo "Bitcoin Core v32.0rc2 binaries missing or not executable in the verified extraction."
     exit 1
 fi
-
-zenity --text-info \
-    --title="Pre-Creation Guide" \
-    --filename="$here/PRE-CREATION-GUIDE.txt" \
-    --width=800 \
-    --height=700 \
-    >/dev/null 2>&1 &
-
-echo "Please read PRE-CREATION-GUIDE.txt in the folder you launched this from before creating your wallet, if you have not already done so."
 
 backup_dir="$here/multisig-backups"
 
@@ -62,7 +72,7 @@ mkdir "$backup_dir"
 
 "$bitcoind_bin" -daemonwait -networkactive=0 -listen=0 -walletdir="$backup_dir"
 printf '\n'
-python3 multisig.py "$bitcoin_cli"
+printf '%s\n' "$policy" | python3 multisig.py "$bitcoin_cli" >/dev/null
 
 cleanup
 trap - EXIT HUP INT TERM

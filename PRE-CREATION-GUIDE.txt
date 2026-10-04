@@ -6,7 +6,7 @@ Before creating the wallet, confirm all of the following:
 [ ] I am working in non-persistent storage in the normal Tails session, not Persistent Storage or another writable disk.
 [ ] I am using Bitcoin Core v32.0rc2 and have verified the release and the release-signing key fingerprints I trust.
 [ ] The CoreVault folder is next to bitcoin-32.0rc2-x86_64-linux-gnu.tar.gz in the same parent folder (any folder works); the tarball is still compressed.
-[ ] I have physically air-gapped this computer by removing its network card(s) and will never connect it to a network again.
+[ ] I have physically air-gapped this computer by removing its network card(s) and will never connect it to a network again. CoreVault also disables NetworkManager networking automatically after I enter the M-of-N policy; this is an additional check, not a substitute for the physical air gap.
 [ ] I have N + 1 blank CD-Rs with me and they are already labeled for each signer and the watch-only wallet.
 [ ] I have protective cases ready for the finished discs.
 [ ] I have a fully synced, unpruned Bitcoin Core node on an online computer ready for the test.
@@ -145,3 +145,9 @@ When you are ready, return to the Console and enter your M-N policy in the reque
 format, for example:
 
 2-3
+
+Immediately after you press Enter, CoreVault runs "nmcli networking off" and checks
+that NetworkManager reports networking as disabled. If that command fails or
+networking does not report disabled, CoreVault stops. The launcher does not verify
+or extract Bitcoin Core and does not start wallet creation until this software
+networking check has passed.
