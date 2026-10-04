@@ -1,8 +1,8 @@
 # CoreVault
 
-Create an M-of-N Bitcoin multisig wallet with a separate wallet for each signer and one watch-only wallet. You choose how many signatures are needed; Bitcoin Core creates the keys and wallets.
+Create an M-of-N Bitcoin multisig wallet with a separate wallet for each signer and one watch-only wallet. You choose how many signatures are needed; Bitcoin Core creates the keys, descriptors, and wallet files.
 
-CoreVault is a small, easy-to-audit helper designed for an offline Tails computer.
+CoreVault is a small, easy-to-audit helper designed for an offline Tails computer. Its goal is to make wallet creation repeatable while keeping custom wallet logic to a minimum.
 
 ## Quick start
 
@@ -13,104 +13,99 @@ CoreVault is a small, easy-to-audit helper designed for an offline Tails compute
 
 Wallets are saved in `CoreVault/multisig-backups`.
 
-Read [PRE-CREATION-GUIDE.txt](PRE-CREATION-GUIDE.txt) before starting and follow [POST-CREATION-GUIDE.txt](POST-CREATION-GUIDE.txt) afterward. Software verification and runtime details are [below](#verification-and-runtime).
+Read [PRE-CREATION-GUIDE.txt](PRE-CREATION-GUIDE.txt) before starting and follow [POST-CREATION-GUIDE.txt](POST-CREATION-GUIDE.txt) afterward. These guides cover preparation, backups, verification, a disposable test spend, shutdown, and storage. [Software verification](#software-verification) is explained below.
 
-## Design
+## What happens when you run it
 
-CoreVault is intentionally a thin layer over Bitcoin Core. It does not implement key generation, derivation, descriptor parsing, wallet storage, signing, or custom cryptography itself. It asks Bitcoin Core to perform those operations through its RPC interface.
+The launcher finds the archive next to the CoreVault folder, verifies it, and extracts a fresh copy into a private RAM-backed directory. You do not need to extract Bitcoin Core yourself.
 
-The project is split so each kind of change has a clear place:
-
-- `multisig.py` — the small wallet-construction layer.
-- `tails.sh` — Tails-specific startup, temporary runtime state, cleanup, and guide display.
-- `PRE-CREATION-GUIDE.txt` — preparation and safety instructions.
-- `POST-CREATION-GUIDE.txt` — backup, verification, test-spend, and storage instructions.
-
-This separation keeps operating-system details and human instructions out of the wallet-construction code.
-
-## Verification and runtime
-
-Download and verify Tails and Bitcoin Core before creating a wallet.
-
-- **Tails:** use the official [Tails Download and Verify](https://tails.net/install/download/) page.
-- **Bitcoin Core verification:** use Bitcoin Core's official [Verify your download](https://bitcoincore.org/en/download/#verify-your-download) instructions.
-- **Bitcoin Core v32.0 release-candidate binaries:** use the official [Bitcoin Core 32.0 directory](https://bitcoincore.org/bin/bitcoin-core-32.0/). At the time of writing, the tested build for this project is [v32.0rc2](https://bitcoincore.org/bin/bitcoin-core-32.0/test.rc2/).
-
-> [!IMPORTANT]
-> **This project currently requires Bitcoin Core v32.0rc2. Bitcoin Core v31.x and older will not work.**
->
-> The generator uses the new `addhdkey` and `derivehdkey` wallet RPCs. These RPCs are present in Bitcoin Core v32.0rc2 and absent from v31.0. Until another v32 release candidate or the final v32.0 release has been tested with this project, use v32.0rc2 exactly.
-
-The launcher copies the tarball into a fresh private directory under `/dev/shm`, checks that copy against the hardcoded SHA-256 from the official [v32.0rc2 SHA256SUMS](https://bitcoincore.org/bin/bitcoin-core-32.0/test.rc2/SHA256SUMS), then extracts that same verified copy. A missing tarball, failed check, or extraction failure stops the launcher before any Core binary runs. It never uses an existing extracted `bitcoin-32.0rc2` folder.
-
-The pinned SHA-256 for `bitcoin-32.0rc2-x86_64-linux-gnu.tar.gz` is:
-
-```text
-0255103718033e6aee15fa944717fc277e047b845bff1e7408af0ea732d8d0c1
-```
-
-This offline check adds protection against using the wrong archive; it does not replace release-signature verification or trust in the reviewed CoreVault launcher and Tails environment. `/dev/shm` needs enough free space for both the archive and extracted release, and must permit execution. If it is mounted `noexec`, the launcher refuses to run; it does not fall back to another Core installation.
-
-After the tarball passes verification and extraction succeeds, `PRE-CREATION-GUIDE.txt` opens in a Zenity text window with the preparation and security instructions. The Console continues independently, so the guide can remain open while you create the wallet. Both guide files remain in the project folder and can be reopened manually at any time.
-
-The Console then starts Bitcoin Core and asks:
+The pre-creation guide then opens in a separate window. The console continues independently, starts Bitcoin Core with networking disabled, and asks:
 
 ```text
 Enter M-N (example 2-3):
 ```
 
-For the intended offline Tails workflow, use non-persistent storage because backups are written inside the CoreVault folder.
+Bitcoin Core creates N signer wallets and one watch-only wallet directly in `CoreVault/multisig-backups`. Use non-persistent storage for the intended offline Tails workflow, because these backups stay inside the CoreVault folder.
 
-The script creates N signer wallets and 1 watch-only wallet directly inside `CoreVault/multisig-backups`. Bitcoin Core's verified extracted binaries and separate runtime data are kept in the temporary RAM-backed directory and removed after generation. Backups remain in the CoreVault folder.
+When generation finishes, the launcher stops Bitcoin Core and removes the temporary binaries and runtime data. It keeps the wallet backups and opens the post-creation guide independently. The console immediately displays `Complete. You may now close this window.`; neither guide needs to be closed for the console to proceed. Both guides can also be reopened from the project folder.
 
-After generation succeeds, Bitcoin Core is stopped, the temporary runtime directory is removed, and `POST-CREATION-GUIDE.txt` opens independently in a Zenity text window with the backup, verification, test-spend, shutdown, and storage procedure. The Console does not wait for the Zenity window to close; it immediately displays `Complete. You may now close this window.`
+## Software verification
 
-## Change and audit policy
+Verify Tails and Bitcoin Core before creating a wallet:
 
-`multisig.py` is the frozen, security-critical component. Once reviewed, it should not change for UX improvements, documentation changes, Tails changes, convenience features, or policy preferences.
+- **Tails:** follow the official [Download and Verify](https://tails.net/install/download/) instructions.
+- **Bitcoin Core:** follow the official [Verify your download](https://bitcoincore.org/en/download/#verify-your-download) instructions, including release-signature verification and independent verification of the signing-key fingerprints you trust.
+- **Required release:** use [Bitcoin Core v32.0rc2](https://bitcoincore.org/bin/bitcoin-core-32.0/test.rc2/) from the official [v32.0 release directory](https://bitcoincore.org/bin/bitcoin-core-32.0/).
 
-If Bitcoin Core changes in a way that requires modifying `multisig.py`, the change should be as small as possible and the modified generator should be reviewed again.
+**Use v32.0rc2 exactly.** The generator requires the new `addhdkey` and `derivehdkey` wallet RPCs, which are absent from v31.0. Another release candidate or the final v32.0 release must be tested before the version pin changes.
 
-`tails.sh` is the environment layer and may change when Tails or Bitcoin Core startup/runtime behavior changes.
+### The launcher's archive check
 
-`PRE-CREATION-GUIDE.txt` and `POST-CREATION-GUIDE.txt` are living operational documentation and are expected to evolve.
+The launcher copies `bitcoin-32.0rc2-x86_64-linux-gnu.tar.gz` into a fresh private directory under `/dev/shm`, verifies that copy, and extracts those same verified bytes. The hardcoded SHA-256 comes from the official [v32.0rc2 SHA256SUMS](https://bitcoincore.org/bin/bitcoin-core-32.0/test.rc2/SHA256SUMS):
 
-`README.md` defines the project architecture and audit boundary and should normally remain stable once the design is settled.
+```text
+0255103718033e6aee15fa944717fc277e047b845bff1e7408af0ea732d8d0c1
+```
 
+A missing archive, failed checksum check, or extraction failure stops the launcher before any Core binary runs. Every invocation of `bitcoin-cli` and `bitcoind` uses an absolute path inside this fresh extraction. The generator receives that exact `bitcoin-cli` path. Existing extracted folders and Core binaries on `PATH` are ignored; the archive digest pins the release contents, making separate version-string checks unnecessary.
 
-An audit should reference an exact Git commit, not simply the moving `main` branch.
+This check works offline and supplements release-signature verification. It still depends on trusted CoreVault files, the hardcoded digest, system utilities, and the Tails environment. It does not establish that the entire creation machine is uncompromised.
 
-The generator has received AI-assisted code review and safety testing, but it has **not** received an independent professional security audit. Independent review by an experienced Bitcoin developer or security reviewer is strongly encouraged before relying on it for substantial value.
+`/dev/shm` must have space for the archive and extracted release and allow execution. If it is mounted `noexec`, the launcher stops rather than using another Core installation.
 
-## Audit notes
+## Design and maintenance
 
-The generator is fixed to:
+CoreVault is a thin layer over Bitcoin Core's RPC interface. Bitcoin Core handles key generation, derivation, descriptor validation, wallet storage, and signing. CoreVault contains no custom cryptography.
 
-- Bitcoin mainnet
-- BIP87 account path `m/87h/0h/0h`
-- native SegWit `wsh(sortedmulti())`
-- receive/change derivation `/<0;1>/*`
-- `timestamp: 0`
+The project separates wallet construction, the operating environment, and the human procedure:
 
-Bitcoin Core generates the keys, descriptors, and wallet databases. No custom cryptography is used.
+| File | Purpose |
+| --- | --- |
+| `multisig.py` | Small, security-critical wallet-construction procedure |
+| `tails.sh` | Tails startup, archive verification, temporary state, cleanup, and guide display |
+| `PRE-CREATION-GUIDE.txt` | Preparation and safety instructions |
+| `POST-CREATION-GUIDE.txt` | Backup, recovery checks, test spend, shutdown, and storage |
+| `AUDIT.md` | Review targets, findings, checks, and limitations |
 
-The launcher runs `bitcoin-cli` and `bitcoind` only by absolute paths inside its fresh, hash-verified extraction under `/dev/shm` and passes that exact `bitcoin-cli` path into `multisig.py`. The pinned archive digest authenticates the exact release contents, so separate version-string checks are unnecessary. CoreVault never resolves either Core binary from the user's `PATH` or from a pre-existing extracted folder. The hardcoded archive digest, launcher, system utilities, and operating environment are part of this trust boundary.
+**Treat `multisig.py` as frozen after review.** UX improvements, guide edits, and operating-system changes belong in the launcher or documentation. If a Core change requires modifying the generator, keep the change small and review it again. Retest the exact Core release before changing the version pin.
 
-`timestamp: 0` is intentional so restoration cannot miss wallet history because of an incorrect offline system clock.
+The guides can evolve with the operating procedure. The README explains the architecture and review boundary. Another launcher, such as `ubuntu.sh`, can support a different environment without changing wallet construction.
 
-Because of the current Bitcoin Core descriptor-import behavior discussed in the open [bitcoin/bitcoin#35377](https://github.com/bitcoin/bitcoin/pull/35377), the generator substitutes each signer's Core-derived xprv only into that signer's descriptor during import. Bitcoin Core still performs the key generation and derivation.
+### Why a reviewed script?
 
-The implementation uses the proposed upstream Bitcoin Core multisig wizard in the open [bitcoin/bitcoin#36325](https://github.com/bitcoin/bitcoin/pull/36325) as a structural reference. The wizard is not part of Bitcoin Core v32.0rc2. CoreVault relies only on RPCs and descriptor behavior present in v32.0rc2, including the current behavior documented by the open [bitcoin/bitcoin#35377](https://github.com/bitcoin/bitcoin/pull/35377).
+CoreVault puts the deterministic creation procedure in version-controlled code so reviewers can inspect, test, hash, and pin one implementation. Operators then execute that reviewed procedure consistently.
 
-A meaningful audit should include functional testing of wallet creation, address derivation, restoration, PSBT signing, and the intended M-of-N spending threshold.
+Bitcoin Core uses version-controlled procedures in its [Guix build system](https://github.com/bitcoin/bitcoin/blob/master/contrib/guix/README.md) and [CI system](https://github.com/bitcoin/bitcoin/blob/master/ci/README.md). The broader emphasis on source control, review, and provenance is also reflected in [NIST's Secure Software Development Framework](https://csrc.nist.gov/pubs/sp/800/218/final) and [SLSA source requirements](https://slsa.dev/spec/v1.2/source-requirements).
 
-If you review or audit the generator, sharing the findings would be greatly appreciated. Help funding an independent audit is also welcome.
+Automation earns trust through review and testing. Users still need to verify software, maintain the air gap, make and test backups, verify receive addresses, and check transactions before signing.
+
+## Review status and wallet details
+
+CoreVault has received AI-assisted source review and safety testing. It has **not received an independent professional security audit**. [AUDIT.md](AUDIT.md) records exact executable hashes, tested revisions, findings, and remaining validation, including Tails testing for the new launcher flow.
+
+A review should target an exact Git commit rather than the moving `main` branch, and include wallet creation, address derivation, restoration, PSBT signing, and the intended M-of-N threshold. Independent review by an experienced Bitcoin developer or security reviewer is strongly encouraged before relying on the wallet for substantial value. Findings and help funding an independent audit are welcome.
+
+The generator uses:
+
+| Setting | Value |
+| --- | --- |
+| Network | Bitcoin mainnet |
+| BIP87 account path | `m/87h/0h/0h` |
+| Descriptor | Native SegWit `wsh(sortedmulti())` |
+| Receive/change branches | `/<0;1>/*` |
+| Descriptor timestamp | `0` |
+
+The zero timestamp ensures restoration can scan the full wallet history even if the offline system clock was incorrect. The documented recovery workflow requires a fully synced, unpruned online node.
+
+For the descriptor-import behavior in v32.0rc2 discussed in [bitcoin/bitcoin#35377](https://github.com/bitcoin/bitcoin/pull/35377), the generator substitutes each signer's Core-derived account xprv only into that signer's descriptor during import. Core performs the key generation and derivation; each signer wallet receives its own private key material and the shared multisig configuration.
+
+The proposed [Bitcoin Core multisig wizard](https://github.com/bitcoin/bitcoin/pull/36325) served as a structural reference. It is not part of v32.0rc2 or a runtime dependency. CoreVault uses RPCs and descriptor behavior available in the pinned release. The upstream proposals' status and relevance to the reviewed release are documented in the audit log.
 
 ## Compared with Yeti 2.0
 
-CoreVault shares the same broad philosophy as [Yeti 2.0](https://github.com/bowlarbear/yeti-2.0): use Bitcoin Core for security-critical Bitcoin functions, use an air-gapped commodity computer, make durable offline backups, and complete a test spend before relying on the wallet.
+CoreVault shares the broad philosophy of [Yeti 2.0](https://github.com/bowlarbear/yeti-2.0): use Bitcoin Core for security-critical functions, create wallets on an air-gapped commodity computer, make durable offline backups, and complete a test spend before relying on the wallet.
 
-The main difference is how the procedure is structured. CoreVault separates the small wallet generator from the operating system and human instructions, while Yeti 2.0 expresses the wallet-construction procedure as commands within its larger operational guide.
+The main difference is how the procedure is organized. CoreVault separates a reviewed wallet generator from the launcher and guides. Yeti 2.0 presents wallet creation as commands within a larger operational guide.
 
 | | CoreVault | Yeti 2.0 |
 | --- | --- | --- |
@@ -126,20 +121,6 @@ The main difference is how the procedure is structured. CoreVault separates the 
 
 The timing figures are operator-time estimates, not benchmarks, and exclude software setup, node sync, disc burning, and the test spend.
 
-### Reviewed automation instead of operator transcription
+Yeti 2.0's command-by-command procedure is more educational, and its fixed 3-of-7 policy removes a user choice. CoreVault lets the user choose a quorum and runs the creation sequence as a small, repeatable script.
 
-CoreVault's approach is closer to a common pattern in mature security engineering: **put the security-relevant procedure in version-controlled code, review that code, pin the exact revision, and execute the reviewed artifact repeatedly.**
-
-Bitcoin Core itself uses this model for security-sensitive engineering work. Its [Guix build system](https://github.com/bitcoin/bitcoin/blob/master/contrib/guix/README.md) packages the reproducible release-build procedure into version-controlled scripts such as `guix-build`, and its [CI system](https://github.com/bitcoin/bitcoin/blob/master/ci/README.md) likewise keeps build and test stages in scripts. Reviewers inspect the implementation; individual builders do not manually reconstruct the entire build by copying a long sequence of commands every time.
-
-The broader secure-software ecosystem follows the same direction. [NIST's Secure Software Development Framework](https://csrc.nist.gov/pubs/sp/800/218/final) emphasizes source control, peer review, recorded review results, and automated analysis in the development workflow. [SLSA](https://slsa.dev/spec/v1.2/source-requirements) likewise treats version-controlled source history and provenance for exact revisions as foundations for trustworthy software processes.
-
-CoreVault applies that principle on a much smaller scale. `multisig.py` is the procedure to review. Once an exact revision has been reviewed, the operator executes that same sequence instead of becoming a second implementation layer by manually copying commands, maintaining shell variables, and carrying intermediate state from one step to the next.
-
-This is not an argument that automation is automatically secure. A script can contain a bug or a backdoor just as a written command can. The security advantage comes from having **one small executable procedure that can be reviewed, tested, hashed, pinned to a commit, and executed consistently**.
-
-The user still has important responsibilities—verifying the software, maintaining the air gap, making and testing backups, verifying receive addresses, and checking transactions before signing. What CoreVault removes is unnecessary human participation in the deterministic wallet-construction sequence itself.
-
-Yeti 2.0's command-by-command procedure is more educational, and its fixed 3-of-7 policy deliberately removes a user choice. CoreVault makes a different tradeoff: the security-critical procedure is treated more like reviewed automation—small, versioned, repeatable, and separate from the operator-facing instructions.
-
-Yeti 2.0 maintainers or other projects are welcome to reuse this architecture while keeping their own operating system, backup policy, or preferred quorum. For example, an `ubuntu.sh` launcher could replace `tails.sh` without changing `multisig.py`.
+Yeti maintainers and other projects are welcome to reuse this architecture with their preferred operating system, backup policy, or quorum.
