@@ -32,6 +32,7 @@ open_guide() {
 }
 
 open_guide "$here/PRE-CREATION-GUIDE.txt"
+echo "Please read PRE-CREATION-GUIDE.txt in the folder you launched this from before creating your wallet, if you have not already done so."
 
 backup_dir="$here/multisig-backups"
 
@@ -68,5 +69,6 @@ trap - EXIT HUP INT TERM
 export HOME="$original_home"
 
 open_guide "$here/POST-CREATION-GUIDE.txt"
+echo "Please read POST-CREATION-GUIDE.txt in the folder you launched this from."
 
 printf '\nComplete. You may now close this window.\n'
