@@ -2,8 +2,20 @@
 
 ## Final review target
 
-**CoreVault commit reviewed:**  
+**Wallet-construction audit baseline:**  
 [`29a65f87f8070cba71458accf3a44a6f7d88b80b`](https://github.com/Jakob-997/CoreVault/commit/29a65f87f8070cba71458accf3a44a6f7d88b80b)
+
+**Final pre-release executable snapshot re-reviewed:**  
+[`d80b31a2dabd437022556936778b4a5427db2db5`](https://github.com/Jakob-997/CoreVault/commit/d80b31a2dabd437022556936778b4a5427db2db5)
+
+Executable blob SHAs at that snapshot:
+
+- `multisig.py`: `19f3988e32566f39e46c4feff1807175c17e06d4`
+- `tails.sh`: `d0e3ebc2f9297fecc0455a6350fe1ff2d95af789`
+
+Between the audit baseline and the final executable snapshot, `multisig.py` did not change. The only executable change was to the Tails launcher so the post-creation Zenity guide opens in a fully detached, nonblocking session. That behavior was then tested successfully on Tails. The other changes were documentation and the code of conduct.
+
+A release tag may point to a later commit containing this audit-log update; the executable files should remain identical to the blob SHAs above.
 
 **Bitcoin Core version reviewed:** `v32.0rc2`  
 **Bitcoin Core commit:**  
@@ -116,6 +128,14 @@ The Bitcoin Core multisig wizard used as a structural reference is currently an 
 The README now distinguishes the proposed wizard from functionality actually present in v32.0rc2.
 
 **Status:** fixed in documentation.
+
+### Nonblocking post-creation guide
+
+The post-creation Zenity window originally blocked the console until the user closed it. A simple background launch then proved unreliable because the window could terminate with the launcher.
+
+The Tails launcher now starts the post-creation guide with `setsid -f`, detached from the console session. The console completes immediately while the guide remains open independently.
+
+**Status:** fixed and tested on Tails.
 
 ## Correctness checks
 
@@ -321,4 +341,4 @@ For this reviewed design:
 5. Keep operational wording and procedure changes in the pre/post guides.
 6. Preserve an exact Git commit as the target of any external audit.
 
-The highest-value next step is an independent Bitcoin developer/security review of the exact commit identified at the top of this file, followed by an end-to-end test with disposable funds on the exact intended hardware and media.
+The highest-value next step is an independent Bitcoin developer/security review of the exact executable blob SHAs identified at the top of this file, followed by a complete disposable-funds test on the exact intended hardware and media.
