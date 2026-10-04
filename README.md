@@ -8,7 +8,7 @@ The goal is a small, repeatable creation procedure that is easy to review. Bitco
 
 1. Download CoreVault and the official [Bitcoin Core v32.0rc2 Linux x86_64 archive](https://bitcoincore.org/bin/bitcoin-core-32.0/test.rc2/) (`bitcoin-32.0rc2-x86_64-linux-gnu.tar.gz`).
 2. Put the `CoreVault` folder next to the **unextracted archive**. Any parent folder works—Home, Downloads, or another folder.
-3. In Tails’ **file manager (File Explorer)**, open the `CoreVault` folder. Right-click `tails.sh`, choose **Properties**, and enable **Allow executing file as program**. Close Properties, then right-click `tails.sh` again and choose **Run as a Program**.
+3. In the **Tails File Explorer**, open the `CoreVault` folder. Right-click `tails.sh`, choose **Properties**, and enable **Allow executing file as program**. Close Properties, then right-click `tails.sh` again and choose **Run as a Program**.
 4. Enter your policy when prompted, for example `2-3` for two signatures out of three signers.
 
 Wallets are saved in `CoreVault/multisig-backups`.
