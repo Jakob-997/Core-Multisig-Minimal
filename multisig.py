@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 import json
 import subprocess
+import sys
+
+bitcoin_cli = sys.argv[1]
 
 threshold, signer_count = map(
     int, input("Enter M-N (example 2-3): ").split("-")
 )
 
 def command(*args, wallet=None):
-    cmd = ["bitcoin-cli"]
+    cmd = [bitcoin_cli]
     if wallet:
         cmd.append(f"-rpcwallet={wallet}")
     return cmd + list(args)
