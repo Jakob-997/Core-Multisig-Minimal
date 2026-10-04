@@ -1,4 +1,4 @@
-# Core Multisig Minimal
+# CoreVault
 
 Create an M-N Bitcoin Core multisig wallet with N separate signer wallets and one watch-only wallet. You choose the M-N policy at the start, and Bitcoin Core handles the key generation, BIP87 derivation, multisig descriptor, and wallet storage.
 
@@ -17,14 +17,14 @@ Download and verify Tails and Bitcoin Core before creating a wallet.
 >
 > The generator uses the new `addhdkey` and `derivehdkey` wallet RPCs. These RPCs are present in Bitcoin Core v32.0rc2 and absent from v31.0. Until another v32 release candidate or the final v32.0 release has been tested with this project, use v32.0rc2 exactly.
 
-On Tails, put the extracted Bitcoin Core folder in your Home folder. Put the `Core-Multisig-Minimal` folder inside the outer extracted folder, beside the inner Bitcoin Core folder:
+On Tails, extract the Bitcoin Core download into your **Home** folder. Then place the `CoreVault` folder inside that extracted Bitcoin Core folder, next to the inner `bitcoin-32.0rc2` folder:
 
 ```text
 Home/
 └── bitcoin-32.0rc2-x86_64-linux-gnu/
     ├── bitcoin-32.0rc2/
     │   └── bin/
-    └── Core-Multisig-Minimal/
+    └── CoreVault/
         ├── multisig.py
         ├── tails.sh
         ├── PRE-CREATION-GUIDE.txt
@@ -67,9 +67,9 @@ The design rule is simple: **freeze the thing that creates the wallet; allow the
 
 This project shares the same broad philosophy as [Yeti 2.0](https://github.com/bowlarbear/yeti-2.0): use Bitcoin Core for security-critical Bitcoin functions, use an air-gapped commodity computer, make durable offline backups, and complete a test spend before relying on the wallet.
 
-The main difference is architectural. Core Multisig Minimal turns wallet construction into a small, frozen program instead of asking the user to manually reproduce an evolving sequence of shell commands.
+The main difference is architectural. CoreVault turns wallet construction into a small, frozen program instead of asking the user to manually reproduce an evolving sequence of shell commands.
 
-| | Core Multisig Minimal | Yeti 2.0 |
+| | CoreVault | Yeti 2.0 |
 | --- | --- | --- |
 | **Audit target** | Small `multisig.py`, intended to remain frozen after review | Security-relevant wallet commands live throughout an evolving operational guide |
 | **Policy** | User selects M-N without changing source | Intentionally fixed to 3-of-7 |
@@ -98,17 +98,17 @@ This is not a claim that user error is impossible. It is a design choice to remo
 
 ### Current Bitcoin Core model
 
-Both projects ultimately use native SegWit `wsh(sortedmulti())`. Core Multisig Minimal follows the newer upstream Bitcoin Core multisig-wizard structure: Bitcoin Core creates the HD key, derives the BIP87 multisig account key at `m/87h/0h/0h`, and that account key is used directly in the shared multipath descriptor.
+Both projects ultimately use native SegWit `wsh(sortedmulti())`. CoreVault follows the newer upstream Bitcoin Core multisig-wizard structure: Bitcoin Core creates the HD key, derives the BIP87 multisig account key at `m/87h/0h/0h`, and that account key is used directly in the shared multipath descriptor.
 
 Yeti 2.0's current guide instead obtains keys by selecting Core's default single-signature `wpkh` descriptors with `listdescriptors` and shell-processing those key expressions before assembling its fixed 3-of-7 descriptor.
 
-Core Multisig Minimal also uses `timestamp: 0`, so restoring the wallet does not depend on the offline computer having a correct wall clock.
+CoreVault also uses `timestamp: 0`, so restoring the wallet does not depend on the offline computer having a correct wall clock.
 
 ### Configurable M-N
 
 Yeti 2.0 intentionally standardizes on 3-of-7, and its FAQ explains that choice.
 
-Core Multisig Minimal treats the quorum as policy rather than implementation. The same frozen generator can create 2-3, 3-5, or another valid M-N without editing the source or maintaining a different command sequence. This does not imply that every quorum is equally appropriate; it means the policy can change without changing the audited generator.
+CoreVault treats the quorum as policy rather than implementation. The same frozen generator can create 2-3, 3-5, or another valid M-N without editing the source or maintaining a different command sequence. This does not imply that every quorum is equally appropriate; it means the policy can change without changing the audited generator.
 
 ### Replaceable environment layer
 
