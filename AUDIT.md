@@ -6,7 +6,7 @@ This AI-assisted re-review covers the launcher change based on commit
 [`aae2e2a569845aeb62e037517237fe02162f1cc8`](https://github.com/Jakob-997/CoreVault/commit/aae2e2a569845aeb62e037517237fe02162f1cc8).
 The exact executable Git blob SHAs for this review are:
 
-- `tails.sh`: `06e8f2e6174c74035d5ff23531511a014337dd34`
+- `tails.sh`: `e41685afa6e35d32a82a6b4379ce45245f6efc82`
 - `multisig.py`: `19f3988e32566f39e46c4feff1807175c17e06d4` — unchanged from the wallet-construction baseline.
 
 ### Trust flow and source of the pin
@@ -39,8 +39,11 @@ on `PATH` are ignored.
 
 The archive digest pins the complete release contents. The redundant version-string
 probes were removed, as was a repeated signal-trap registration. Executable-file
-checks and both phases of cleanup remain. The resulting launcher is two lines
-shorter than the previous adjacent-folder launcher, with no compressed shell logic.
+checks and both phases of cleanup remain. Copying, checking the hardcoded digest,
+and extraction are three commands. `sha256sum --check` reports a mismatch or read
+error and returns failure; the existing `set -e` stops execution before extraction.
+The resulting launcher is six lines shorter than the previous adjacent-folder
+launcher, with no compressed shell logic.
 
 Runtime HOME remains in that private directory. Wallet backups remain at
 `CoreVault/multisig-backups`, outside temporary cleanup. An existing backup
@@ -49,6 +52,16 @@ startup, cleanup retains the existing stop-and-wait behavior before deleting
 temporary runtime state and extracted executables.
 
 ### Validation and result
+
+The 13 Ubuntu/WSL cases below passed for launcher blob
+`06e8f2e6174c74035d5ff23531511a014337dd34`, before the final reduction of the
+checksum conditional to a direct checked command. For the final blob identified
+above, `dash -n` and four shell control-flow checks passed: success continued;
+simulated copy, checksum, and extraction failures stopped under `set -e`; copy
+and checksum failures never reached extraction. The Linux integration suite and
+ShellCheck could not be rerun for this final reduction because WSL access was
+denied under the current app permissions. These final checks used mocked commands
+and do not replace a Linux/Tails integration retest.
 
 - POSIX shell syntax checked with `dash -n`; ShellCheck passed without findings.
 - Tested on Ubuntu under WSL with the actual hash-matching release archive.
