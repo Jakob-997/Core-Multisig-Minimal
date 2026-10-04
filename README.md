@@ -29,7 +29,7 @@ To run it in Tails:
 3. Close the properties window.
 4. Right-click `tails.sh` again and choose **Run as a Program**.
 
-`PRE-CREATION-GUIDE.txt` opens first with the preparation and security instructions. Read it before creating the wallet, then close it and return to the Console. Both guide files remain in the project folder and can be reopened manually at any time. If Tails has a compatible window-control utility available, the launcher also attempts to maximize the guide window.
+`PRE-CREATION-GUIDE.txt` opens first in a Zenity text window with the preparation and security instructions. Read it before creating the wallet, then close it and return to the Console. Both guide files remain in the project folder and can be reopened manually at any time. If Tails has a compatible window-control utility available, the launcher also attempts to maximize the guide window.
 
 The Console then starts Bitcoin Core and asks:
 
@@ -39,13 +39,13 @@ Enter M-N (example 2-3):
 
 The script creates N signer wallets and 1 watch-only wallet directly inside `multisig-backups`. Bitcoin Core's separate runtime data is kept in a temporary RAM-backed directory and removed after generation.
 
-After generation succeeds, Bitcoin Core is stopped, the temporary runtime directory is removed, and `POST-CREATION-GUIDE.txt` opens with the backup, verification, test-spend, shutdown, and storage procedure. The Console then displays `Complete. You may now close this window.`
+After generation succeeds, Bitcoin Core is stopped, the temporary runtime directory is removed, and `POST-CREATION-GUIDE.txt` opens in a Zenity text window with the backup, verification, test-spend, shutdown, and storage procedure. The Console then displays `Complete. You may now close this window.`
 
 ## Audit
 
 `multisig.py` is the generic Bitcoin Core multisig generator. It contains only the wallet-construction logic; Tails-specific safety, storage, and operating instructions are kept out of it to make the security-critical code easier to audit.
 
-`tails.sh` handles only the Tails environment, Bitcoin Core process/runtime setup and cleanup, and opening the two static guide files. Preparation instructions are in `PRE-CREATION-GUIDE.txt`; the post-generation procedure is in `POST-CREATION-GUIDE.txt`.
+`tails.sh` handles only the Tails environment, Bitcoin Core process/runtime setup and cleanup, and displaying the two static guide files with Zenity. Preparation instructions are in `PRE-CREATION-GUIDE.txt`; the post-generation procedure is in `POST-CREATION-GUIDE.txt`.
 
 The wallet is fixed to BIP87 native SegWit `wsh(sortedmulti())`. Bitcoin Core generates the keys, descriptors, and wallet databases. No custom cryptography is used.
 
