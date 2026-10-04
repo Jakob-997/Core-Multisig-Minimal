@@ -1,0 +1,31 @@
+POST-CREATION GUIDE
+
+Your M-N Bitcoin Core multisig wallet has been created.
+
+The "multisig-backups" folder in the same directory as this guide contains one
+folder for each signer and one watch-only wallet.
+
+Keep this computer and all backup media attended for the rest of this process.
+
+1. Burn each signer folder and the watch-only folder to its matching labeled CD-R
+   using Brasero.
+
+2. Verify every CD-R can be read and every wallet loads correctly.
+
+3. Confirm every signer wallet and the watch-only wallet derive the same multisig
+   receive addresses.
+
+4. Do a disposable test spend. Try signing with every signer wallet and confirm
+   that the intended M-of-N threshold can complete the transaction.
+
+5. Once every CD-R has been verified and the test spend succeeds, immediately
+   shut the computer down and remove the Tails USB.
+
+6. Put each labeled CD-R in a protective, durable case and take it directly to
+   its intended storage location.
+
+The signer wallets are not encrypted. Anyone with a signer disc can copy that
+signer's private key. Do not leave the computer or backup discs unattended at
+any point during this process.
+
+Finished. You can now close this guide.
