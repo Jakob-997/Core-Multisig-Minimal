@@ -8,30 +8,8 @@ bitcoin_bin=$(find "$here/.." -maxdepth 2 -type d -path '*/bitcoin-*/bin' -print
     exit 1
 }
 
-open_guide() {
-    guide="$1"
-    opened=0
+zenity --text-info     --title="Pre-Creation Guide"     --filename="$here/PRE-CREATION-GUIDE.txt"     --width=800     --height=700 || true
 
-    if command -v gnome-text-editor >/dev/null 2>&1; then
-        gnome-text-editor "$guide" >/dev/null 2>&1 &
-        opened=1
-    elif command -v gio >/dev/null 2>&1; then
-        if gio open "$guide"; then
-            opened=1
-        fi
-    else
-        echo "Could not open $(basename "$guide") automatically."
-        echo "Open it manually from this folder."
-    fi
-
-    if [ "$opened" -eq 1 ] && command -v wmctrl >/dev/null 2>&1; then
-        sleep 1
-        wmctrl -r "$(basename "$guide")" -b add,maximized_vert,maximized_horz \
-            >/dev/null 2>&1 || true
-    fi
-}
-
-open_guide "$here/PRE-CREATION-GUIDE.txt"
 echo "Please read PRE-CREATION-GUIDE.txt in the folder you launched this from before creating your wallet, if you have not already done so."
 
 backup_dir="$here/multisig-backups"
@@ -68,7 +46,8 @@ cleanup
 trap - EXIT HUP INT TERM
 export HOME="$original_home"
 
-open_guide "$here/POST-CREATION-GUIDE.txt"
+zenity --text-info     --title="Post-Creation Guide"     --filename="$here/POST-CREATION-GUIDE.txt"     --width=800     --height=700 || true
+
 echo "Please read POST-CREATION-GUIDE.txt in the folder you launched this from."
 
 printf '\nComplete. You may now close this window.\n'
