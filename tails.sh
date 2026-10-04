@@ -2,19 +2,30 @@
 set -e
 
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-bitcoin_bin=$(find "$here/.." -maxdepth 2 -type d -path '*/bitcoin-*/bin' -print -quit)
-[ -n "$bitcoin_bin" ] || {
-    echo "Bitcoin Core bin directory not found."
-    exit 1
-}
-
+bitcoin_bin="$here/../bitcoin-32.0rc2/bin"
 bitcoin_cli="$bitcoin_bin/bitcoin-cli"
 bitcoind_bin="$bitcoin_bin/bitcoind"
 
 [ -x "$bitcoin_cli" ] && [ -x "$bitcoind_bin" ] || {
-    echo "Required Bitcoin Core binaries not found."
+    echo "Bitcoin Core v32.0rc2 binaries not found in the expected folder."
     exit 1
 }
+
+case "$("$bitcoin_cli" -version 2>/dev/null)" in
+    *"Bitcoin Core RPC client version v32.0.0rc2"*) ;;
+    *)
+        echo "CoreVault requires Bitcoin Core v32.0rc2."
+        exit 1
+        ;;
+esac
+
+case "$("$bitcoind_bin" -version 2>/dev/null)" in
+    *"Bitcoin Core daemon version v32.0.0rc2"*) ;;
+    *)
+        echo "CoreVault requires Bitcoin Core v32.0rc2."
+        exit 1
+        ;;
+esac
 
 zenity --text-info \
     --title="Pre-Creation Guide" \
