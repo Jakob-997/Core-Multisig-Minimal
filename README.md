@@ -4,10 +4,6 @@ Create an M-N Bitcoin Core multisig wallet with N separate signer wallets and on
 
 The goal is a small, easy-to-audit multisig generator with as little custom wallet logic as possible.
 
-## Short demonstration
-
-https://github.com/user-attachments/assets/6942f638-588e-437c-9999-db534ad24bf6
-
 ## Use
 
 Download and verify Tails and Bitcoin Core before creating a wallet.
@@ -50,7 +46,7 @@ To run it in Tails:
 3. Close the properties window.
 4. Right-click `tails.sh` again and choose **Run as a Program**.
 
-`PRE-CREATION-GUIDE.txt` opens first in a Zenity text window with the preparation and security instructions. The Console continues independently, so the guide can remain open while you create the wallet. Both guide files remain in the project folder and can be reopened manually at any time.
+After the tarball passes verification and extraction succeeds, `PRE-CREATION-GUIDE.txt` opens in a Zenity text window with the preparation and security instructions. The Console continues independently, so the guide can remain open while you create the wallet. Both guide files remain in the project folder and can be reopened manually at any time.
 
 The Console then starts Bitcoin Core and asks:
 
