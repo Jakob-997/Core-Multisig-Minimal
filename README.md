@@ -17,10 +17,10 @@ Download and verify Tails and Bitcoin Core before creating a wallet.
 >
 > The generator uses the new `addhdkey` and `derivehdkey` wallet RPCs. These RPCs are present in Bitcoin Core v32.0rc2 and absent from v31.0. Until another v32 release candidate or the final v32.0 release has been tested with this project, use v32.0rc2 exactly.
 
-On Tails, place the `CoreVault` folder next to the official **Linux x86_64** tarball in your normal, non-persistent **Home** folder. Keep the tarball compressed; no manual extraction is needed:
+Download CoreVault and the official Bitcoin Core v32.0rc2 **Linux x86_64** archive. Place the `CoreVault` folder next to the unextracted `bitcoin-32.0rc2-x86_64-linux-gnu.tar.gz` archive in the same parent folder. **Home or Downloads both work** in your normal, non-persistent Tails session. The launcher finds the archive next to its own folder, regardless of where you launch it from; no manual Bitcoin Core extraction is needed. For example:
 
 ```text
-Home/
+Downloads/
 ├── bitcoin-32.0rc2-x86_64-linux-gnu.tar.gz
 └── CoreVault/
     ├── multisig.py
