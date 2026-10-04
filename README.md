@@ -91,13 +91,13 @@ The generator is fixed to:
 
 Bitcoin Core generates the keys, descriptors, and wallet databases. No custom cryptography is used.
 
-The launcher resolves the Bitcoin Core binaries from the adjacent extracted Bitcoin Core folder and passes the exact `bitcoin-cli` path into `multisig.py`. CoreVault does not resolve `bitcoin-cli` or `bitcoind` from the user's `PATH`.
+The launcher uses only the expected adjacent `bitcoin-32.0rc2/bin` directory, verifies that both `bitcoin-cli` and `bitcoind` report v32.0rc2, and passes the exact `bitcoin-cli` path into `multisig.py`. CoreVault does not resolve either Core binary from the user's `PATH`.
 
 `timestamp: 0` is intentional so restoration cannot miss wallet history because of an incorrect offline system clock.
 
-Because of the current Bitcoin Core descriptor-import behavior discussed in [bitcoin/bitcoin#35377](https://github.com/bitcoin/bitcoin/pull/35377), the generator substitutes each signer's Core-derived xprv only into that signer's descriptor during import. Bitcoin Core still performs the key generation and derivation.
+Because of the current Bitcoin Core descriptor-import behavior discussed in the open [bitcoin/bitcoin#35377](https://github.com/bitcoin/bitcoin/pull/35377), the generator substitutes each signer's Core-derived xprv only into that signer's descriptor during import. Bitcoin Core still performs the key generation and derivation.
 
-The implementation uses the upstream Bitcoin Core multisig wizard work as its primary reference, including [bitcoin/bitcoin#36325](https://github.com/bitcoin/bitcoin/pull/36325) and the related behavior discussed in [bitcoin/bitcoin#35377](https://github.com/bitcoin/bitcoin/pull/35377).
+The implementation uses the proposed upstream Bitcoin Core multisig wizard in the open [bitcoin/bitcoin#36325](https://github.com/bitcoin/bitcoin/pull/36325) as a structural reference. The wizard is not part of Bitcoin Core v32.0rc2. CoreVault relies only on RPCs and descriptor behavior present in v32.0rc2, including the current behavior documented by the open [bitcoin/bitcoin#35377](https://github.com/bitcoin/bitcoin/pull/35377).
 
 A meaningful audit should include functional testing of wallet creation, address derivation, restoration, PSBT signing, and the intended M-of-N spending threshold.
 
