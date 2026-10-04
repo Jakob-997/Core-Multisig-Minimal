@@ -48,7 +48,7 @@ Enter M-N (example 2-3):
 
 The script creates N signer wallets and 1 watch-only wallet directly inside `multisig-backups`. Bitcoin Core's separate runtime data is kept in a temporary RAM-backed directory and removed after generation.
 
-After generation succeeds, Bitcoin Core is stopped, the temporary runtime directory is removed, and `POST-CREATION-GUIDE.txt` opens in a Zenity text window with the backup, verification, test-spend, shutdown, and storage procedure. The Console then displays `Complete. You may now close this window.`
+After generation succeeds, Bitcoin Core is stopped, the temporary runtime directory is removed, and `POST-CREATION-GUIDE.txt` opens independently in a Zenity text window with the backup, verification, test-spend, shutdown, and storage procedure. The Console does not wait for the Zenity window to close; it immediately displays `Complete. You may now close this window.`
 
 ## Design
 
