@@ -5,6 +5,7 @@ Before creating the wallet, confirm all of the following:
 [ ] I have verified the Tails ISO.
 [ ] I am working from the normal non-persistent Tails Home folder, not Persistent Storage or another writable disk.
 [ ] I am using Bitcoin Core v32.0rc2 and have verified the release and the release-signing key fingerprints I trust.
+[ ] The CoreVault folder is next to bitcoin-32.0rc2-x86_64-linux-gnu.tar.gz in my non-persistent Home folder; the tarball is still compressed.
 [ ] I have physically air-gapped this computer by removing its network card(s) and will never connect it to a network again.
 [ ] I have N + 1 blank CD-Rs with me and they are already labeled for each signer and the watch-only wallet.
 [ ] I have protective cases ready for the finished discs.
@@ -45,6 +46,41 @@ with this project, use v32.0rc2 exactly.
 Verify Bitcoin Core's release signatures, and independently verify the fingerprints
 of the release-signing keys you choose to trust. Do not rely only on keys or
 fingerprints obtained from the same download you are verifying.
+
+PLACE THE TARBALL NEXT TO COREVAULT
+
+Download the official Linux x86_64 archive from:
+https://bitcoincore.org/bin/bitcoin-core-32.0/test.rc2/
+
+Home/
+    bitcoin-32.0rc2-x86_64-linux-gnu.tar.gz
+    CoreVault/
+        tails.sh
+        multisig.py
+        PRE-CREATION-GUIDE.txt
+        POST-CREATION-GUIDE.txt
+
+Do not extract the archive yourself. The launcher copies it into a fresh private
+directory under /dev/shm, verifies that copy against this hardcoded official
+SHA-256, and only then extracts that same copy:
+
+0255103718033e6aee15fa944717fc277e047b845bff1e7408af0ea732d8d0c1
+
+Checksum source:
+https://bitcoincore.org/bin/bitcoin-core-32.0/test.rc2/SHA256SUMS
+
+Missing, unreadable, wrong, or damaged archives stop the launcher. Only bitcoin-cli
+and bitcoind from this freshly verified extraction are used, never an existing
+bitcoin-32.0rc2 folder or a Core installation found through PATH. Verification is
+offline and does not download a replacement. It supplements signature verification;
+you must still trust the reviewed CoreVault files, Tails, and system utilities.
+
+/dev/shm must have room for the archive and extracted release and allow execution.
+If execution is blocked (noexec), the launcher stops rather than using another
+installation. The extracted binaries and runtime state are removed on normal
+completion or a handled failure. Uncatchable termination or power loss cannot run
+cleanup. Wallet backups remain in CoreVault/multisig-backups; they are not deleted
+by cleanup. Keep CoreVault in non-persistent Home as required above.
 
 PERMANENT AIR GAP
 
