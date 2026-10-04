@@ -2,6 +2,15 @@ PRE-CREATION GUIDE
 
 Read this before creating the wallet.
 
+When you have finished reading this guide and are ready to create the wallet,
+close this window and return to the Console.
+
+You can reopen these instructions at any time from this project folder:
+PRE-CREATION-GUIDE.txt
+
+After wallet creation, the remaining instructions are in:
+POST-CREATION-GUIDE.txt
+
 VERIFY YOUR SOFTWARE
 
 Use a verified Tails ISO and a verified Bitcoin Core release.
