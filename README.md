@@ -102,7 +102,7 @@ If you are considering using CoreVault, we strongly encourage an independent rev
 | Receive/change branches | `/<0;1>/*` |
 | Descriptor timestamp | `0` |
 
-The zero timestamp avoids relying on the offline machine's clock to determine how much history to scan during restoration. The documented recovery workflow uses a fully synced, unpruned online node.
+The zero timestamp avoids relying on the offline machine's clock to determine how much history to scan during restoration. The online node may be pruned, but it must still have every block Core needs to bring the copied wallet current. If required history has already been pruned, Core may require a reindex/redownload or a node with the missing block history.
 
 For v32.0rc2's descriptor-import behavior discussed in [bitcoin/bitcoin#35377](https://github.com/bitcoin/bitcoin/pull/35377), each signer imports the shared descriptor with only its own account xpub replaced by its Core-derived xprv.
 

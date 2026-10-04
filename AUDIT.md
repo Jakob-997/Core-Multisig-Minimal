@@ -322,7 +322,7 @@ The launcher now waits for Core processes to exit before removing the temporary 
 
 CoreVault intentionally imports descriptors with `timestamp: 0`. When the watch-only wallet created offline is later loaded on an online node, Core must be able to scan the historical chain to discover old transactions.
 
-The operating instructions now require a fully synced, **unpruned** online Bitcoin Core node for the initial restoration/test workflow.
+The operating instructions now require a fully synced online Bitcoin Core node with all block history needed to synchronize or rescan the copied wallet. A pruned node is acceptable only while the blocks Core needs are still available; if the wallet's required history is older than the retained prune window, Core may require a reindex/redownload or a node with the missing history. Because CoreVault deliberately uses `timestamp: 0`, pruning does not remove the full-history recovery requirement.
 
 **Status:** documented and required operationally.
 

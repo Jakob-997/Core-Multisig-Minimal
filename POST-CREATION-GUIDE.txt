@@ -50,8 +50,11 @@ Keep this computer and all backup media attended for the rest of this process.
 4. Take ONLY the WATCH ONLY disc to your online computer.
 
    Copy the watch_only folder from the CD-R to writable storage on your fully
-   synced, unpruned online Bitcoin Core computer, then load that copied wallet.
-   Use this wallet to monitor the multisig and to create unsigned transactions/PSBTs.
+   synced online Bitcoin Core computer, then load that copied wallet. The node may
+   be pruned, but it must still have every block Core needs to synchronize this
+   wallet. If Core reports that the required history has already been pruned,
+   reindex/redownload or use a node with the missing block history. Use this wallet
+   to monitor the multisig and to create unsigned transactions/PSBTs.
 
    NEVER put a signer disc into the online computer.
 
