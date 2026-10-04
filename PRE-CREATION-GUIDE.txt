@@ -4,7 +4,7 @@ Before creating the wallet, confirm all of the following:
 
 [ ] I have verified the Tails ISO.
 [ ] I am working from the normal non-persistent Tails Home folder, not Persistent Storage or another writable disk.
-[ ] I have verified the Bitcoin Core release and the release-signing key fingerprints I trust.
+[ ] I am using Bitcoin Core v32.0rc2 and have verified the release and the release-signing key fingerprints I trust.
 [ ] I have physically air-gapped this computer by removing its network card(s) and will never connect it to a network again.
 [ ] I have N + 1 blank CD-Rs with me and they are already labeled for each signer and the watch-only wallet.
 [ ] I have protective cases ready for the finished discs.
@@ -24,7 +24,23 @@ POST-CREATION-GUIDE.txt
 
 VERIFY YOUR SOFTWARE
 
-Use a verified Tails ISO and a verified Bitcoin Core release.
+Use a verified Tails ISO and Bitcoin Core v32.0rc2.
+
+Official Tails download and verification:
+https://tails.net/install/download/
+
+Official Bitcoin Core verification instructions:
+https://bitcoincore.org/en/download/#verify-your-download
+
+Official Bitcoin Core v32.0 release-candidate directory:
+https://bitcoincore.org/bin/bitcoin-core-32.0/
+
+This project currently requires Bitcoin Core v32.0rc2. Bitcoin Core v31.x and
+older will not work. The generator uses the new addhdkey and derivehdkey wallet
+RPCs, which are available in v32.0rc2 but not in v31.0.
+
+Until another v32 release candidate or the final v32.0 release has been tested
+with this project, use v32.0rc2 exactly.
 
 Verify Bitcoin Core's release signatures, and independently verify the fingerprints
 of the release-signing keys you choose to trust. Do not rely only on keys or
