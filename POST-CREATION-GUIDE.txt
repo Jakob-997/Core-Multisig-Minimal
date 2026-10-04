@@ -35,17 +35,57 @@ Keep this computer and all backup media attended for the rest of this process.
 3. Confirm every signer wallet and the watch-only wallet derive the same multisig
    receive addresses.
 
-4. Do a disposable test spend. Try signing with every signer wallet and confirm
-   that the intended M-of-N threshold can complete the transaction.
+   For this workflow, the verified offline signer computer is the source of truth.
+   Do not rely on an online computer alone to tell you that a receive address is
+   correct.
 
-5. Once every CD-R has been verified and the test spend succeeds, immediately
-   shut the computer down and remove the Tails USB.
+   Before sending bitcoin to any receive address shown on the online computer,
+   independently verify that the same address is derived by an offline signer.
 
-6. Put each labeled CD-R in a protective, durable case and take it directly to
+4. Take ONLY the WATCH ONLY disc to your online computer.
+
+   On your fully synced online Bitcoin Core node, restore/load the watch-only wallet.
+   Use this wallet to monitor the multisig and to create unsigned transactions/PSBTs.
+
+   NEVER put a signer disc into the online computer.
+
+5. Do a disposable test spend.
+
+   Send a small amount of bitcoin to a receive address that you have independently
+   verified on the offline signer.
+
+   Use the online watch-only wallet to create the unsigned test transaction/PSBT.
+   Transfer the unsigned PSBT to the offline signer computer.
+
+   Before signing, verify the destination address, amount, fee, and transaction
+   details on the OFFLINE computer.
+
+   Try signing with every signer wallet so you know every signer disc works, and
+   confirm that the intended M-of-N threshold can complete the transaction.
+
+ONLINE COMPUTER IS UNTRUSTED
+
+Treat the online computer as potentially compromised. Malware on an online machine
+can change what appears on the screen, substitute addresses, alter transaction
+details, or make a malicious transaction look legitimate.
+
+For transaction approval, trust the verified offline signer display, not the online
+computer:
+
+- Verify receive addresses with an offline signer before sending bitcoin to them.
+- Verify destination addresses and amounts on the offline computer before signing.
+- Never place a signer CD-R in an online computer.
+- Never sign a transaction merely because the online computer says it is correct.
+
+6. Once every CD-R has been verified and the test spend succeeds, immediately
+   shut the offline computer down and remove the Tails USB.
+
+7. Put each labeled CD-R in a protective, durable case and take it directly to
    its intended storage location.
 
 The signer wallets are not encrypted. Anyone with a signer disc can copy that
-signer's private key. Do not leave the computer or backup discs unattended at
-any point during this process.
+signer's private key. Anyone with any of the wallet discs can derive the wallet's
+addresses and monitor its on-chain activity. Do not leave the computer or backup
+discs unattended at any point during this process.
 
 Finished. You can now close this guide.
