@@ -9,7 +9,6 @@ bitcoin_bin=$(find "$here/.." -maxdepth 2 -type d -path '*/bitcoin-*/bin' -print
 }
 
 backup_dir="$here/multisig-backups"
-mkdir "$backup_dir"
 
 original_home=$HOME
 state=$(mktemp -d /dev/shm/core-multisig.XXXXXX)
@@ -33,6 +32,7 @@ trap cleanup EXIT
 trap 'exit 1' HUP INT TERM
 
 stop_core
+mkdir "$backup_dir"
 
 cat <<'EOF'
 Create your M-N Bitcoin Core multisig wallet.
