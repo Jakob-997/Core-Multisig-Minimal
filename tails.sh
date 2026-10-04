@@ -73,12 +73,12 @@ cleanup
 trap - EXIT HUP INT TERM
 export HOME="$original_home"
 
-nohup zenity --text-info \
+setsid -f zenity --text-info \
     --title="Post-Creation Guide" \
     --filename="$here/POST-CREATION-GUIDE.txt" \
     --width=800 \
     --height=700 \
-    </dev/null >/dev/null 2>&1 &
+    </dev/null >/dev/null 2>&1
 
 echo "Please read POST-CREATION-GUIDE.txt in the folder you launched this from."
 
