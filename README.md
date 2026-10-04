@@ -38,7 +38,7 @@ Enter M-N (example 2-3):
 
 The script creates N signer wallets and 1 watch-only wallet directly inside `multisig-backups`. Bitcoin Core's separate runtime data is kept in a temporary RAM-backed directory and removed after generation.
 
-After generation succeeds, Bitcoin Core is stopped, the temporary runtime directory is removed, and `POST-CREATION-GUIDE.txt` opens in GNOME Text Editor. Follow that guide continuously through burning, verification, test spending, shutdown, and storage.
+After generation succeeds, Bitcoin Core is stopped, the temporary runtime directory is removed, and `POST-CREATION-GUIDE.txt` is opened with Tails' default text editor. The Console then displays `Complete. You may now close this window.` Follow the guide continuously through burning, verification, test spending, shutdown, and storage.
 
 ## Audit
 
