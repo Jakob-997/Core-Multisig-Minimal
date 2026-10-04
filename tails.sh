@@ -7,14 +7,16 @@ state=$(mktemp -d /dev/shm/core-multisig.XXXXXX)
 trap 'rm -rf "$state"' EXIT
 trap 'exit 1' HUP INT TERM
 
-# Pin the official Linux x86_64 release; verify the private copy we extract.
-# https://bitcoincore.org/bin/bitcoin-core-32.0/test.rc2/SHA256SUMS
-cp -- "$here/../bitcoin-32.0rc2-x86_64-linux-gnu.tar.gz" "$state/core.tar.gz"
-printf '0255103718033e6aee15fa944717fc277e047b845bff1e7408af0ea732d8d0c1  %s\n' "$state/core.tar.gz" | sha256sum --check
-tar -xzf "$state/core.tar.gz" -C "$state" --no-same-owner
-rm -- "$state/core.tar.gz"
+archive="$here/../bitcoin-32.0rc2-x86_64-linux-gnu.tar.gz"
 
-bitcoin_bin="$state/bitcoin-32.0rc2/bin"
+# Pin the official Linux x86_64 release before extracting it.
+# https://bitcoincore.org/bin/bitcoin-core-32.0/test.rc2/SHA256SUMS
+printf '0255103718033e6aee15fa944717fc277e047b845bff1e7408af0ea732d8d0c1  %s\n' "$archive" | sha256sum --check
+
+core_dir=$(mktemp -d "$here/../bitcoin-32.0rc2-corevault.XXXXXX")
+tar -xzf "$archive" -C "$core_dir" --strip-components=1 --no-same-owner
+
+bitcoin_bin="$core_dir/bin"
 bitcoin_cli="$bitcoin_bin/bitcoin-cli"
 bitcoind_bin="$bitcoin_bin/bitcoind"
 
@@ -22,6 +24,9 @@ if [ ! -x "$bitcoin_cli" ] || [ ! -x "$bitcoind_bin" ]; then
     echo "Bitcoin Core v32.0rc2 binaries missing or not executable in the verified extraction."
     exit 1
 fi
+
+echo "Bitcoin Core verified and freshly extracted to:"
+echo "$core_dir"
 
 zenity --text-info \
     --title="Pre-Creation Guide" \
