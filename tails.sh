@@ -53,6 +53,15 @@ cleanup
 trap - EXIT HUP INT TERM
 export HOME="$original_home"
 
-xdg-open "$here/POST-CREATION-GUIDE.txt" >/dev/null 2>&1 &
+guide="$here/POST-CREATION-GUIDE.txt"
+
+if command -v gio >/dev/null 2>&1; then
+    gio open "$guide" || true
+elif command -v gnome-text-editor >/dev/null 2>&1; then
+    gnome-text-editor "$guide" >/dev/null 2>&1 &
+else
+    echo "Could not open POST-CREATION-GUIDE.txt automatically."
+    echo "Open it manually from this folder."
+fi
 
 printf '\nComplete. You may now close this window.\n'
