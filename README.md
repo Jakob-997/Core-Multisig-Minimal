@@ -1,26 +1,5 @@
 # CoreVault
 
-```text
-          .-------.   .-------.   .-------.
-         /  CD 1  \ /  CD 2  \ /  CD N  \
-        |    o    | |    o    | |    o    |
-         \_______/   \_______/   \_______/
-             \           |           /
-              \          |          /
-               '--------- + --------'
-                          |
-              .---------------------.
-              |      COREVAULT      |
-              |      M   OF   N     |
-              |                     |
-              |  wsh(sortedmulti()) |
-              |        .-----.      |
-              |       /  ___  \     |
-              |      |  (_)  |      |
-              |       \_____/       |
-              '---------------------'
-```
-
 Create an M-N Bitcoin Core multisig wallet with N separate signer wallets and one watch-only wallet. You choose the M-N policy at the start, and Bitcoin Core handles the key generation, BIP87 derivation, multisig descriptor, and wallet storage.
 
 The goal is a small, easy-to-audit multisig generator with as little custom wallet logic as possible.
