@@ -26,6 +26,8 @@ The design instead tries to make the trust surface small enough to verify: a sho
 
 ## Quick start
 
+> **For a real wallet:** use a dedicated computer, preferably a laptop, that is physically air-gapped with its network hardware removed and never reconnected to any network afterward. CoreVault's software networking shutdown is defense in depth, not a substitute for permanent physical isolation.
+
 ```text
 1. Verify Tails and Bitcoin Core v32.0rc2.
 2. Put CoreVault next to:
