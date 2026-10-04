@@ -7,6 +7,8 @@ Before creating the wallet, confirm all of the following:
 [ ] I have physically air-gapped this computer by removing its network card(s) and will never connect it to a network again.
 [ ] I have N + 1 blank CD-Rs with me and they are already labeled for each signer and the watch-only wallet.
 [ ] I have protective cases ready for the finished discs.
+[ ] I have a fully synced Bitcoin Core node on an online computer ready for the test.
+[ ] I have a small amount of bitcoin ready to use for the disposable test spend.
 [ ] I understand that anyone who gets access to any of these CDs can derive this wallet's addresses and monitor its past and future on-chain activity. A signer CD also contains that signer's private key.
 [ ] I have enough uninterrupted time to create the wallet, burn and verify every disc, perform a test spend, shut the computer down, and take every disc directly to its storage location without leaving the computer or backups unattended.
 
