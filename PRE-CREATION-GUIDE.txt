@@ -65,28 +65,34 @@ Downloads/
         PRE-CREATION-GUIDE.txt
         POST-CREATION-GUIDE.txt
 
-Do not extract the archive yourself. The launcher copies it into a fresh private
-directory under /dev/shm, verifies that copy against this hardcoded official
-SHA-256, and only then extracts that same copy:
+Do not extract the archive yourself. The launcher verifies the adjacent tarball
+against this hardcoded official SHA-256:
 
 0255103718033e6aee15fa944717fc277e047b845bff1e7408af0ea732d8d0c1
 
 Checksum source:
 https://bitcoincore.org/bin/bitcoin-core-32.0/test.rc2/SHA256SUMS
 
-Missing, unreadable, wrong, or damaged archives stop the launcher. Only bitcoin-cli
-and bitcoind from this freshly verified extraction are used, never an existing
-bitcoin-32.0rc2 folder or a Core installation found through PATH. Verification is
-offline and does not download a replacement. It supplements signature verification;
-you must still trust the reviewed CoreVault files, Tails, and system utilities.
+After the checksum passes, the launcher creates a brand-new empty directory next
+to the archive with a unique name such as:
 
-/dev/shm must have room for the archive and extracted release and allow execution.
-If execution is blocked (noexec), the launcher stops rather than using another
-installation. The extracted binaries and runtime state are removed on normal
-completion or a handled failure. Uncatchable termination or power loss cannot run
-cleanup. Wallet backups remain in CoreVault/multisig-backups; they are not deleted
-by cleanup. For the intended offline Tails workflow, keep CoreVault in non-persistent
-storage as required above, because wallet backups are written inside its folder.
+bitcoin-32.0rc2-corevault.A1B2C3
+
+It extracts the verified Bitcoin Core release into that new directory and uses
+only bitcoin-cli and bitcoind from that extraction. Existing extracted Core
+folders and Core installations found through PATH are ignored.
+
+Missing, unreadable, wrong, or damaged archives stop the launcher before Core runs.
+Verification is offline and does not download a replacement. It supplements
+signature verification; you must still trust the reviewed CoreVault files, Tails,
+and system utilities.
+
+The freshly extracted Bitcoin Core directory is intentionally left in place after
+the run so you may use it afterward. Only Core's temporary runtime state under
+/dev/shm is removed. Wallet backups remain in CoreVault/multisig-backups; they are
+not deleted by cleanup. For the intended offline Tails workflow, keep CoreVault in
+non-persistent storage as required above, because wallet backups are written inside
+its folder.
 
 PERMANENT AIR GAP
 
