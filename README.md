@@ -6,7 +6,7 @@ The goal is a small, easy-to-audit multisig generator with as little custom wall
 
 ## Use
 
-Before running this, verify the Tails ISO and the Bitcoin Core v32 release. Verify Bitcoin Core's release signatures, and independently verify the trusted signer key fingerprints rather than simply trusting keys that came with the download.
+Download and verify Tails and Bitcoin Core v32.
 
 On Tails, put the extracted Bitcoin Core folder in your Home folder. Put the `Core-Multisig-Minimal` folder inside the outer extracted folder, beside the inner Bitcoin Core folder:
 
@@ -18,10 +18,9 @@ Home/
     └── Core-Multisig-Minimal/
         ├── multisig.py
         ├── tails.sh
+        ├── PRE-CREATION-GUIDE.txt
         └── POST-CREATION-GUIDE.txt
 ```
-
-If this will be a wallet you actually use, permanently air-gap the computer first. Remove its network card(s), including Wi-Fi/Bluetooth and any WWAN/cellular hardware if present, disconnect Ethernet, and never connect the computer to a network again.
 
 To run it in Tails:
 
@@ -30,7 +29,9 @@ To run it in Tails:
 3. Close the properties window.
 4. Right-click `tails.sh` again and choose **Run as a Program**.
 
-A Console window opens and asks:
+`PRE-CREATION-GUIDE.txt` opens first with the preparation and security instructions. Read it before creating the wallet.
+
+The Console then starts Bitcoin Core and asks:
 
 ```text
 Enter M-N (example 2-3):
@@ -38,13 +39,13 @@ Enter M-N (example 2-3):
 
 The script creates N signer wallets and 1 watch-only wallet directly inside `multisig-backups`. Bitcoin Core's separate runtime data is kept in a temporary RAM-backed directory and removed after generation.
 
-After generation succeeds, Bitcoin Core is stopped, the temporary runtime directory is removed, and `POST-CREATION-GUIDE.txt` is opened with Tails' default text editor. The Console then displays `Complete. You may now close this window.` Follow the guide continuously through burning, verification, test spending, shutdown, and storage.
+After generation succeeds, Bitcoin Core is stopped, the temporary runtime directory is removed, and `POST-CREATION-GUIDE.txt` opens with the backup, verification, test-spend, shutdown, and storage procedure. The Console then displays `Complete. You may now close this window.`
 
 ## Audit
 
 `multisig.py` is the generic Bitcoin Core multisig generator. It contains only the wallet-construction logic; Tails-specific safety, storage, and operating instructions are kept out of it to make the security-critical code easier to audit.
 
-`tails.sh` handles only the Tails environment and Bitcoin Core process/runtime setup and cleanup. The post-generation human procedure is kept separately in `POST-CREATION-GUIDE.txt`.
+`tails.sh` handles only the Tails environment, Bitcoin Core process/runtime setup and cleanup, and opening the two static guide files. Preparation instructions are in `PRE-CREATION-GUIDE.txt`; the post-generation procedure is in `POST-CREATION-GUIDE.txt`.
 
 The wallet is fixed to BIP87 native SegWit `wsh(sortedmulti())`. Bitcoin Core generates the keys, descriptors, and wallet databases. No custom cryptography is used.
 
