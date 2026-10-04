@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
 import json
 import subprocess
-from pathlib import Path
 
 threshold, signer_count = map(
     int, input("Enter M-N (example 2-3): ").split("-")
 )
-
-backup_dir = Path("multisig-backups").resolve()
-backup_dir.mkdir()
 
 def command(*args, wallet=None):
     cmd = ["bitcoin-cli"]
@@ -48,13 +44,3 @@ import_descriptor("watch_only", descriptor_body)
 for number, key in enumerate(keys, 1):
     private_body = descriptor_body.replace(key["xpub"], key["xprv"])
     import_descriptor(f"signer_{number}", private_body)
-
-wallets = ["watch_only"] + [f"signer_{n}" for n in range(1, signer_count + 1)]
-for wallet in wallets:
-    wallet_backup = backup_dir / wallet
-    wallet_backup.mkdir()
-    subprocess.run(
-        command("backupwallet", str(wallet_backup / "wallet.dat"), wallet=wallet),
-        check=True,
-    )
-
