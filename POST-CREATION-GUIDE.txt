@@ -2,6 +2,9 @@ POST-CREATION GUIDE
 
 Your M-N Bitcoin Core multisig wallet has been created.
 
+You can reopen this guide at any time from the project folder as:
+POST-CREATION-GUIDE.txt
+
 The "multisig-backups" folder in the same directory as this guide contains one
 folder for each signer and one watch-only wallet.
 
