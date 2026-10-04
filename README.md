@@ -84,14 +84,6 @@ The project is split so each kind of change has a clear place:
 
 This separation keeps operating-system details and human instructions out of the wallet-construction code.
 
-### Low user burden
-
-After the environment is prepared, wallet creation is intentionally simple: launch `tails.sh`, enter the desired M-N policy, and let the reviewed sequence run.
-
-The user still has important responsibilities—verifying software, maintaining the air gap, creating and testing backups, verifying receive addresses, and checking transactions before signing—but the user is not required to manually reconstruct the multisig with a sequence of shell commands.
-
-Automating a fixed Bitcoin Core RPC sequence does not add cryptographic trust; it removes unnecessary opportunities for skipped steps, stale commands, malformed shell variables, and commands executed in the wrong state.
-
 ## Change and audit policy
 
 `multisig.py` is the frozen, security-critical component. Once reviewed, it should not change for UX improvements, documentation changes, Tails changes, convenience features, or policy preferences.
@@ -122,9 +114,9 @@ Bitcoin Core generates the keys, descriptors, and wallet databases. No custom cr
 
 `timestamp: 0` is intentional so restoration cannot miss wallet history because of an incorrect offline system clock.
 
-Because of the current Bitcoin Core descriptor-import behavior discussed in `bitcoin/bitcoin#35377`, the generator substitutes each signer's Core-derived xprv only into that signer's descriptor during import. Bitcoin Core still performs the key generation and derivation.
+Because of the current Bitcoin Core descriptor-import behavior discussed in [bitcoin/bitcoin#35377](https://github.com/bitcoin/bitcoin/pull/35377), the generator substitutes each signer's Core-derived xprv only into that signer's descriptor during import. Bitcoin Core still performs the key generation and derivation.
 
-The implementation uses the upstream Bitcoin Core multisig wizard work as its primary reference, including `bitcoin/bitcoin#36325` and the related behavior discussed in `bitcoin/bitcoin#35377`.
+The implementation uses the upstream Bitcoin Core multisig wizard work as its primary reference, including [bitcoin/bitcoin#36325](https://github.com/bitcoin/bitcoin/pull/36325) and the related behavior discussed in [bitcoin/bitcoin#35377](https://github.com/bitcoin/bitcoin/pull/35377).
 
 A meaningful audit should include functional testing of wallet creation, address derivation, restoration, PSBT signing, and the intended M-of-N spending threshold.
 
@@ -149,6 +141,16 @@ The main difference is how the procedure is structured. CoreVault separates the 
 | **Documentation changes** | Pre/post guides can evolve without changing wallet construction | Operational instructions and wallet-construction commands live together |
 
 The timing figures are operator-time estimates, not benchmarks, and exclude software setup, node sync, disc burning, and the test spend.
+
+### Lower user burden
+
+This is one of CoreVault's main differences from Yeti 2.0.
+
+After the environment is prepared, CoreVault's wallet-creation step is intentionally simple: launch `tails.sh`, enter the desired M-N policy, and let the reviewed sequence run. The user does not have to manually reconstruct the multisig with a chain of shell commands or preserve intermediate shell state.
+
+The user still has important responsibilities—verifying software, maintaining the air gap, creating and testing backups, verifying receive addresses, and checking transactions before signing—but automating the fixed Bitcoin Core RPC sequence removes unnecessary opportunities for skipped steps, stale commands, malformed shell variables, or commands executed in the wrong state.
+
+Copying and pasting CLI commands can be educational, but CoreVault does not treat manual command entry as a security control. The same RPC sequence remains fully visible in `multisig.py` for review while the ordinary user has fewer ways to make a construction mistake.
 
 Yeti 2.0's command-by-command procedure is more educational, and its fixed 3-of-7 policy deliberately removes a user choice. CoreVault makes a different tradeoff: fewer manual construction steps and a smaller, more stable audit boundary.
 
