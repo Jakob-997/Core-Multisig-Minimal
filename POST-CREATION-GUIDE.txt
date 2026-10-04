@@ -10,8 +10,25 @@ folder for each signer and one watch-only wallet.
 
 Keep this computer and all backup media attended for the rest of this process.
 
-1. Burn each signer folder and the watch-only folder to its matching labeled CD-R
-   using Brasero.
+1. Burn each signer folder and the watch-only folder to its matching labeled CD-R.
+
+   Brasero is included with Tails and can burn these wallet folders as ordinary
+   data discs.
+
+   For each wallet folder:
+
+   - Open Brasero and choose "Data Project".
+   - Click the + / Add button and add exactly one wallet folder, such as signer_1.
+   - Make sure the project contains the correct wallet folder for the disc you
+     labeled.
+   - Insert the matching blank CD-R.
+   - Click "Burn" and select the optical drive.
+   - Do not choose "Burn image". These are ordinary folders, not ISO images.
+   - When the burn finishes, eject and reinsert the disc and confirm that the
+     wallet folder and its wallet.dat file can be opened and read.
+
+   Repeat this separately for every signer folder and for the watch_only folder,
+   using one labeled CD-R per wallet folder.
 
 2. Verify every CD-R can be read and every wallet loads correctly.
 
