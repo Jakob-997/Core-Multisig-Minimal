@@ -19,11 +19,11 @@ The launcher finds the archive relative to its own folder, so you do not need to
 
 ### What to expect
 
-The launcher checks the archive, extracts a fresh copy, and starts Bitcoin Core with networking disabled. The pre-creation guide opens in a separate window while the console asks for your policy.
+The launcher checks the archive, creates a brand-new uniquely named Bitcoin Core directory next to it, extracts the verified release there, and starts only that copy with networking disabled. The pre-creation guide opens in a separate window while the console asks for your policy.
 
 Wallets are written directly to **`CoreVault/multisig-backups`**. Each signer wallet contains that signer's private key material and the shared multisig configuration; the watch-only wallet contains the public configuration.
 
-After generation, the launcher stops Core and removes the temporary binaries and runtime data. The backups stay in CoreVault, and [POST-CREATION-GUIDE.txt](POST-CREATION-GUIDE.txt) opens with the backup, verification, test-spend, shutdown, and storage procedure. The console completes without waiting for either guide window to close. Both guides can be reopened from the project folder.
+After generation, the launcher stops Core and removes only the temporary runtime data. The freshly extracted Bitcoin Core directory is left next to the archive for the user. The backups stay in CoreVault, and [POST-CREATION-GUIDE.txt](POST-CREATION-GUIDE.txt) opens with the backup, verification, test-spend, shutdown, and storage procedure. The console completes without waiting for either guide window to close. Both guides can be reopened from the project folder.
 
 For the intended offline Tails workflow, keep CoreVault in non-persistent storage. Its signer backups are unencrypted and must be protected until they have been backed up and the computer is shut down.
 
@@ -49,11 +49,11 @@ Verify [Tails](https://tails.net/install/download/) and follow Bitcoin Core's of
 
 The launcher adds an offline check every time it runs:
 
-1. Copy the adjacent archive into a fresh private directory under `/dev/shm`.
-2. Check that copy against the hardcoded official SHA-256 for v32.0rc2 Linux x86_64.
-3. Extract the same verified copy and use only its `bitcoin-cli` and `bitcoind`, by absolute path.
+1. Check the adjacent archive against the hardcoded official SHA-256 for v32.0rc2 Linux x86_64.
+2. Create a new empty directory with a unique name such as `bitcoin-32.0rc2-corevault.A1B2C3`.
+3. Extract the verified archive into that new directory and use only its `bitcoin-cli` and `bitcoind`, by absolute path.
 
-A missing archive, failed check, or extraction failure stops execution before Core runs. Existing extracted Core folders and installations on `PATH` are ignored. The generator receives the exact path to the freshly extracted `bitcoin-cli`.
+A missing archive, failed check, or extraction failure stops execution before Core runs. Existing extracted Core folders and installations on `PATH` are ignored because each run creates its own fresh directory. The generator receives the exact path to that newly extracted `bitcoin-cli`. The extracted Core directory is intentionally left in place afterward; only Core's temporary runtime state is removed.
 
 The pinned digest from the official [SHA256SUMS](https://bitcoincore.org/bin/bitcoin-core-32.0/test.rc2/SHA256SUMS) is:
 
@@ -61,7 +61,7 @@ The pinned digest from the official [SHA256SUMS](https://bitcoincore.org/bin/bit
 0255103718033e6aee15fa944717fc277e047b845bff1e7408af0ea732d8d0c1
 ```
 
-This supplements signature verification and depends on trustworthy CoreVault files, system utilities, and the host. `/dev/shm` must have enough space for the archive and extraction and permit execution; a `noexec` mount causes the launcher to stop.
+This supplements signature verification and depends on trustworthy CoreVault files, system utilities, and the host. The extraction itself is placed beside the archive in a fresh directory; `/dev/shm` is used only for Bitcoin Core's temporary runtime state.
 
 All signer keys are generated on one machine. Multisig protects against later loss or theft of separately stored backups, but a compromised creation environment can compromise every key. A checksum and an air gap do not remove that assumption.
 
@@ -69,7 +69,7 @@ All signer keys are generated on one machine. Multisig protects against later lo
 
 CoreVault has received **AI-assisted source review and safety testing**, but **no independent professional security audit**. [AUDIT.md](AUDIT.md) records the exact executable hashes, review findings, tested revisions, and limitations.
 
-The generator remains unchanged from its recorded review baseline. The launcher has been re-reviewed for the verified-archive flow. An earlier launcher revision passed 13 Linux integration cases, including disposable wallet creation and failure handling. The final three-command simplification passed shell syntax and control-flow checks; its Linux integration retest and validation on Tails remain outstanding. Optical-media recovery and test spends also remain to be validated for this flow.
+The generator remains unchanged from its recorded review baseline. The launcher has been re-reviewed for the verified-archive flow. Earlier launcher revisions passed Linux integration cases including disposable wallet creation and failure handling. The current fresh-directory extraction change is intentionally small, but should still receive an end-to-end Tails retest before the next release candidate. Optical-media recovery and test spends also remain to be validated for this flow.
 
 The architecture is intended to stay stable while the launcher and operating guides improve. The current release-candidate dependency is deliberate: `addhdkey` and `derivehdkey` provide the Core-native key workflow used here. A later release requires testing, not simply a filename change.
 
@@ -119,7 +119,7 @@ Yeti places generation commands inside its operating guide. CoreVault separates 
 
 - **One procedure to review and execute.** Reviewers can inspect, test, hash, and pin the generator. Users execute that exact sequence rather than recreate it through successive command blocks and persistent shell variables. This reduces opportunities to omit or reorder steps.
 - **Failure handling is part of the code.** CoreVault stops on RPC failures and explicitly checks whether descriptor imports succeeded. The procedure does not rely solely on the operator noticing and correctly interpreting every returned result.
-- **The intended Core binary is enforced.** The launcher verifies a private copy of the pinned archive, extracts it fresh, and uses only that copy. An old extracted folder or another installation cannot be selected accidentally.
+- **The intended Core binary is enforced.** The launcher verifies the pinned archive, extracts it into a brand-new uniquely named directory, and uses only that copy. An old extracted folder or another installation cannot be selected accidentally.
 - **Instructions can improve without changing generation.** Preparation and backup guidance can evolve while the generator stays stable. Operating-system changes stay in the launcher and receive their own review, rather than being mixed into wallet construction.
 - **Core remains responsible for Bitcoin operations.** The generator follows the Core-native key workflow reflected in the proposed upstream wizard and keeps custom transformations small. It uses structured RPC results and sends sensitive parameters over standard input. This concentrates the project-specific logic into a defined surface that can be tested directly.
 
