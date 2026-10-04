@@ -6,7 +6,16 @@ The goal is a small, easy-to-audit multisig generator with as little custom wall
 
 ## Use
 
-Download and verify Tails and Bitcoin Core v32.
+Download and verify Tails and Bitcoin Core before creating a wallet.
+
+- **Tails:** use the official [Tails Download and Verify](https://tails.net/install/download/) page.
+- **Bitcoin Core verification:** use Bitcoin Core's official [Verify your download](https://bitcoincore.org/en/download/#verify-your-download) instructions.
+- **Bitcoin Core v32.0 release-candidate binaries:** use the official [Bitcoin Core 32.0 directory](https://bitcoincore.org/bin/bitcoin-core-32.0/). At the time of writing, the tested build for this project is [v32.0rc2](https://bitcoincore.org/bin/bitcoin-core-32.0/test.rc2/).
+
+> [!IMPORTANT]
+> **This project currently requires Bitcoin Core v32.0rc2. Bitcoin Core v31.x and older will not work.**
+>
+> The generator uses the new `addhdkey` and `derivehdkey` wallet RPCs. These RPCs are present in Bitcoin Core v32.0rc2 and absent from v31.0. Until another v32 release candidate or the final v32.0 release has been tested with this project, use v32.0rc2 exactly.
 
 On Tails, put the extracted Bitcoin Core folder in your Home folder. Put the `Core-Multisig-Minimal` folder inside the outer extracted folder, beside the inner Bitcoin Core folder:
 
