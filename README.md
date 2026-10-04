@@ -4,6 +4,10 @@ CoreVault creates an M-of-N Bitcoin multisig wallet on an offline Tails computer
 
 The project has one central goal: **make multisig generation a small, repeatable procedure that people can review and trust.** Bitcoin Core handles the keys and wallet operations. CoreVault connects the steps, checks their results, and keeps the generation code separate from the operating system and instructions.
 
+## Demo
+
+[Watch the updated CoreVault demo](https://github.com/Jakob-997/CoreVault/releases/download/v0.1.0-rc2/coreVault-latest-demo.mp4)
+
 ## Getting started
 
 Read [PRE-CREATION-GUIDE.txt](PRE-CREATION-GUIDE.txt) before starting. It covers software verification, preparing the offline computer, choosing a quorum, and getting the backup process ready.
