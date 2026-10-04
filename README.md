@@ -4,6 +4,16 @@ CoreVault creates an M-of-N Bitcoin multisig wallet on an offline Tails computer
 
 The project has one central goal: **make multisig generation a small, repeatable procedure that people can review and trust.** Bitcoin Core handles the keys and wallet operations. CoreVault connects the steps, checks their results, and keeps the generation code separate from the operating system and instructions.
 
+## Why trust a random GitHub script?
+
+You should not trust CoreVault because of who wrote it. The design is meant to make the author's identity much less important. The security-critical generator is intentionally small, contains no custom cryptography, and delegates key generation, derivation, descriptor validation, and wallet storage to a pinned Bitcoin Core release. The launcher disables NetworkManager networking before Core is extracted or any keys are generated, verifies the exact Core archive it will use, and runs only the freshly extracted binaries.
+
+That does not make the project automatically safe. It makes the trust problem **small enough to inspect**. A reviewer does not need to audit a new cryptographic library or a large wallet application; they can review a short generator, a small launcher, and the specific assumptions CoreVault makes about Bitcoin Core. Exact executable revisions and hashes are recorded in [AUDIT.md](AUDIT.md), and the generator is treated as frozen unless a Core behavior change requires it to be reviewed again.
+
+The intended security model is therefore not “trust an anonymous maintainer.” It is: **verify a small procedure that mostly asks Bitcoin Core to perform standard wallet operations.** Users can inspect the exact source, pin an exact commit, test the complete workflow with disposable funds, and have an independent Bitcoin expert review the same revision. If a security-relevant behavior cannot be explained in terms of Bitcoin Core or simple operating-system plumbing, it should be treated skeptically.
+
+This still requires trust in the verified Tails environment, the pinned Bitcoin Core release, the host hardware and entropy source, and the exact CoreVault revision being run. CoreVault tries to make those trust boundaries explicit rather than hide them.
+
 ## Demo
 
 https://github.com/user-attachments/assets/fae51512-3197-4d1b-b880-21e0152dc246
