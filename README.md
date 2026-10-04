@@ -29,7 +29,7 @@ To run it in Tails:
 3. Close the properties window.
 4. Right-click `tails.sh` again and choose **Run as a Program**.
 
-`PRE-CREATION-GUIDE.txt` opens first in a Zenity text window with the preparation and security instructions. Read it before creating the wallet, then close it and return to the Console. Both guide files remain in the project folder and can be reopened manually at any time.
+`PRE-CREATION-GUIDE.txt` opens first in a Zenity text window with the preparation and security instructions. The Console continues independently, so the guide can remain open while you create the wallet. Both guide files remain in the project folder and can be reopened manually at any time.
 
 The Console then starts Bitcoin Core and asks:
 
@@ -41,117 +41,106 @@ The script creates N signer wallets and 1 watch-only wallet directly inside `mul
 
 After generation succeeds, Bitcoin Core is stopped, the temporary runtime directory is removed, and `POST-CREATION-GUIDE.txt` opens in a Zenity text window with the backup, verification, test-spend, shutdown, and storage procedure. The Console then displays `Complete. You may now close this window.`
 
+## Architecture
+
+The project is intentionally split into four layers:
+
+- `multisig.py` — the small, security-critical wallet generator. This is the part intended to be frozen after review.
+- `tails.sh` — the Tails-specific launcher and runtime layer. Environment changes belong here, not in the generator.
+- `PRE-CREATION-GUIDE.txt` — preparation and safety instructions.
+- `POST-CREATION-GUIDE.txt` — backup, verification, test-spend, and storage instructions.
+
+Bitcoin Core performs the actual key generation, BIP87 derivation, descriptor parsing, wallet storage, and signing primitives. The project does not implement custom cryptography.
+
+The design rule is simple: **freeze the thing that creates the wallet; allow the environment and human instructions around it to evolve independently.**
+
 ## Compared with Yeti 2.0
 
-This project was influenced by the same general philosophy as [Yeti 2.0](https://github.com/bowlarbear/yeti-2.0): use Bitcoin Core for the security-critical Bitcoin functions, use an air-gapped commodity computer, make durable offline backups, and require a test spend before relying on the wallet.
+This project shares the same broad philosophy as [Yeti 2.0](https://github.com/bowlarbear/yeti-2.0): use Bitcoin Core for security-critical Bitcoin functions, use an air-gapped commodity computer, make durable offline backups, and complete a test spend before relying on the wallet.
 
-The main difference is architectural. **Core Multisig Minimal is designed around a small, frozen wallet generator with the operating system, user interface, and human procedure kept outside of that audit boundary.** This project considers that structure an improvement for auditability, maintenance, and reproducibility. It is not a claim that Yeti 2.0 is inherently insecure.
+The main difference is architectural. Core Multisig Minimal turns wallet construction into a small, frozen program instead of asking the user to manually reproduce an evolving sequence of shell commands.
 
 | | Core Multisig Minimal | Yeti 2.0 |
 | --- | --- | --- |
-| **Security-critical audit target** | A small `multisig.py` intended to be frozen after review | Wallet construction is expressed as shell commands embedded throughout an evolving procedure |
-| **Policy** | User selects M-N without changing generator source | Intentionally fixed to 3-of-7 |
-| **Key structure** | BIP87 account keys derived by Core at `m/87h/0h/0h` | Extracts Core's default single-signature `wpkh` descriptors and rewrites their derivation suffix for the multisig |
-| **Descriptor construction** | Current Core multisig-wizard-style `wsh(sortedmulti())` multipath descriptor using `/<0;1>/*` | Also uses `wsh(sortedmulti())`, assembled from shell-parsed descriptor output |
-| **Descriptor tooling** | Bitcoin Core RPC + Python standard library | Bitcoin Core RPC plus shell processing with tools including `jq`, `grep`, and `sed` |
-| **Descriptor timestamp** | `timestamp: 0`, so wallet history does not depend on the offline computer's clock | Current guide constructs the import request using `date +%s` |
-| **User execution** | Launch once and enter M-N | User copies and pastes a sequence of individual CLI commands |
-| **Deployment layer** | Tails is isolated in `tails.sh`; the generator itself is environment-neutral | Ubuntu setup and wallet procedure are integrated into the guide |
-| **Human instructions** | Pre- and post-creation guides are separate files that can evolve without touching the generator | Operational guidance and wallet-construction commands live together in the main procedure |
-| **Audit invalidation** | A change to `multisig.py` explicitly requires re-review | Changes to security-relevant commands in the procedure change the effective implementation |
+| **Audit target** | Small `multisig.py`, intended to remain frozen after review | Security-relevant wallet commands live throughout an evolving operational guide |
+| **Policy** | User selects M-N without changing source | Intentionally fixed to 3-of-7 |
+| **Key structure** | Core derives BIP87 account keys at `m/87h/0h/0h` | Extracts Core default `wpkh` descriptors and rewrites their derivation suffix for multisig use |
+| **Descriptor construction** | Core multisig-wizard-style `wsh(sortedmulti())` multipath descriptor using `/<0;1>/*` | `wsh(sortedmulti())` assembled from shell-parsed descriptor output |
+| **Extra descriptor tooling** | Bitcoin Core RPC + Python standard library | Bitcoin Core RPC plus `jq`, `grep`, and `sed` in the wallet-construction path |
+| **Descriptor timestamp** | `timestamp: 0`; restoration does not depend on the offline clock | Current guide builds the import timestamp from `date +%s` |
+| **User execution** | Launch once, enter M-N, let the reviewed sequence run | Copy/paste several individual command blocks and preserve shell state between them |
+| **User burden** | Very few security-critical inputs or manual construction steps | More opportunities for skipped commands, stale commands, transcription mistakes, or shell-state differences |
+| **Approx. wallet-creation time after prerequisites** | Roughly **1–3 minutes** for the generator itself on a typical machine; excludes reading, disc burning, and the test spend | Roughly **10–20 minutes** for a careful first-time user to work through the wallet-construction commands; excludes OS/Core setup, node sync, backups, and test spend |
+| **Deployment** | Tails-specific behavior is isolated in `tails.sh`; another launcher can replace it | Ubuntu setup and wallet procedure are integrated into the main guide |
+| **Human instructions** | Pre/post guides can change without changing the wallet generator | Operational instructions and wallet-construction commands live together |
+| **Audit invalidation** | Any `multisig.py` change explicitly requires re-review | Changing a security-relevant command changes the effective implementation |
 
-### Why freeze the generator?
+The timing row is an operator-time estimate, not a benchmark. Hardware speed, familiarity, and how carefully the user verifies each step can change it substantially.
 
-A security audit is most useful when the thing being audited has a clear boundary and does not keep changing.
+### Lower user burden is a security feature
 
-The intended rule here is simple:
+This project deliberately minimizes what the user has to get right during wallet creation.
 
-- `multisig.py` is frozen.
-- Bitcoin Core performs the key generation, derivation, descriptor parsing, wallet storage, and signing primitives.
-- User-interface or operating-system changes belong in `tails.sh`.
-- Wording, backup instructions, and operational improvements belong in the pre- and post-creation guides.
-- If Bitcoin Core changes in a way that requires modifying `multisig.py`, that modification should be small, explicit, and reviewed again.
+After the environment is prepared, the user launches one file and chooses the M-N policy. The reviewed generator then performs the same Bitcoin Core RPC sequence every time. There are still important operational responsibilities—verifying software, maintaining the air gap, making and testing backups, checking receive addresses, and verifying transactions before signing—but the user is not asked to manually reconstruct the wallet logic.
 
-That means an auditor can review one exact commit of one small generator and know that future changes to a Tails window, a CD-burning instruction, or guide wording do not silently change the multisig construction they reviewed.
+Copying and pasting CLI commands can be educational, but it provides no additional cryptographic assurance over running the same reviewed commands from a frozen script. Automating that fixed sequence reduces opportunities for skipped steps, stale documentation, malformed shell variables, or commands executed in the wrong state.
 
-For someone deciding where to spend limited audit effort on the **wallet-construction logic**, this project deliberately presents a smaller and more stable target.
+This is not a claim that user error is impossible. It is a design choice to remove as many unnecessary opportunities for user error as practical.
 
-### Why not require the user to copy and paste the Core commands?
+### Current Bitcoin Core model
 
-Copying and pasting commands can be educational because the user can see each operation individually. Yeti 2.0 deliberately uses that model.
+Both projects ultimately use native SegWit `wsh(sortedmulti())`. Core Multisig Minimal follows the newer upstream Bitcoin Core multisig-wizard structure: Bitcoin Core creates the HD key, derives the BIP87 multisig account key at `m/87h/0h/0h`, and that account key is used directly in the shared multipath descriptor.
 
-For this project, however, manual copy/paste is not treated as a security control. It provides no additional cryptographic assurance over executing the same reviewed Bitcoin Core RPC sequence from a frozen script. It also introduces another place for transcription mistakes, skipped commands, stale commands, shell-state differences, or version-specific edits.
+Yeti 2.0's current guide instead obtains keys by selecting Core's default single-signature `wpkh` descriptors with `listdescriptors` and shell-processing those key expressions before assembling its fixed 3-of-7 descriptor.
 
-The source remains fully visible. An auditor or advanced user can read every RPC call in `multisig.py`; the ordinary user simply does not have to manually reproduce the audited sequence.
+Core Multisig Minimal also uses `timestamp: 0`, so restoring the wallet does not depend on the offline computer having a correct wall clock.
 
-### Current Bitcoin Core descriptor model
+### Configurable M-N
 
-Both projects ultimately create native SegWit `wsh(sortedmulti())` descriptors. The difference is how the keys used in that descriptor are obtained.
+Yeti 2.0 intentionally standardizes on 3-of-7, and its FAQ explains that choice.
 
-The current Yeti 2.0 guide creates normal Core wallets, calls `listdescriptors`, selects their default `wpkh` descriptors, and uses shell tools to extract and rewrite those key expressions before building a hard-coded 3-of-7 descriptor.
+Core Multisig Minimal treats the quorum as policy rather than implementation. The same frozen generator can create 2-3, 3-5, or another valid M-N without editing the source or maintaining a different command sequence. This does not imply that every quorum is equally appropriate; it means the policy can change without changing the audited generator.
 
-Core Multisig Minimal instead follows the newer upstream Bitcoin Core multisig-wizard work: Core creates the HD key, derives the BIP87 multisig account key at `m/87h/0h/0h`, and that account key is used directly in the shared multipath descriptor. This avoids repurposing a default single-signature account descriptor to obtain the multisig keys.
+### Replaceable environment layer
 
-### M-N instead of a fixed 3-of-7
+Tails is the reference environment, not part of the multisig algorithm.
 
-Yeti 2.0 explicitly chooses 3-of-7 as part of its opinionated vault design. That is a legitimate design choice and its FAQ explains the reasoning.
+A project that prefers Ubuntu could write an `ubuntu.sh` launcher while leaving `multisig.py` unchanged. That launcher would handle Ubuntu-specific details such as Core paths, temporary storage, networking assumptions, and installing or providing disc-burning software. Yeti 2.0's current Ubuntu procedure, for example, explicitly installs Brasero.
 
-Core Multisig Minimal separates the **wallet-construction mechanism** from that policy choice. The same frozen generator can create, for example, a 2-3 or 3-5 wallet without editing the code or maintaining separate command sequences.
+Yeti 2.0 maintainers and other projects are welcome to fork or reuse this structure while keeping their own operating-system choice, backup policy, or recommended quorum. The reusable idea is the separation of a **frozen generator**, an **environment-specific launcher**, and **living human guides**.
 
-This does not mean every M-N policy is equally appropriate. It means changing the quorum does not require changing the audited implementation.
+This comparison is about auditability and maintenance architecture, not a claim that Yeti 2.0 is inherently insecure. Yeti's command-by-command approach is more educational, and its fixed 3-of-7 policy deliberately removes a user choice.
 
-### Separate launchers
+## Change and audit policy
 
-Tails is the reference deployment for this repository, not part of the multisig construction itself.
+`multisig.py` is the frozen, security-critical component. After review, it should not be changed for UX improvements, documentation changes, Tails changes, convenience features, or policy preferences. If Bitcoin Core changes in a way that requires modifying the generator, the change should be as small as possible and the modified generator should be reviewed again.
 
-Someone who prefers another environment can create a different launcher—an `ubuntu.sh`, for example—while leaving `multisig.py` unchanged. That launcher would be responsible for the environment-specific details, such as Core paths, temporary storage, networking assumptions, and ensuring suitable optical-disc burning software is available. Yeti 2.0's current Ubuntu procedure, for example, explicitly installs Brasero.
+`tails.sh` is the environment layer and may change when Tails or Bitcoin Core startup/runtime behavior changes.
 
-This separation is intentional: disagreement about Tails should not require a fork of the wallet algorithm.
+`PRE-CREATION-GUIDE.txt` and `POST-CREATION-GUIDE.txt` are operational documentation and are expected to evolve. Routine safety and usability wording belongs there.
 
-### Invitation to Yeti and other projects
+`README.md` defines the architecture and audit boundary and should normally remain stable once the design is settled.
 
-Yeti 2.0 maintainers, users, or other Bitcoin projects are welcome to adopt, fork, or use this architecture as a reference.
+An audit should reference an exact Git commit, not simply the moving `main` branch.
 
-In particular, the useful pattern is not the Tails launcher itself. It is the separation of:
+The generator has received AI-assisted code review and safety testing, but it has **not** received an independent professional security audit. Independent review by an experienced Bitcoin developer or security reviewer is strongly encouraged before relying on it for substantial value.
 
-1. a **small frozen multisig generator**,
-2. an **environment-specific launcher**, and
-3. **pre- and post-creation human guides** that can improve without modifying the audited wallet construction.
+## Audit notes
 
-A Yeti-style project could retain its preferred Ubuntu environment, backup philosophy, or 3-of-7 recommendation while using the same frozen-generator boundary.
+The generator is fixed to:
 
-### Scope of this comparison
+- Bitcoin mainnet
+- BIP87 account path `m/87h/0h/0h`
+- native SegWit `wsh(sortedmulti())`
+- receive/change derivation `/<0;1>/*`
+- `timestamp: 0`
 
-Yeti 2.0 has advantages of its own. Its command-by-command procedure is highly explicit and educational, and its fixed 3-of-7 policy intentionally removes a user decision. This project's claim is narrower: **the frozen-generator architecture creates a cleaner audit target and allows UX, deployment, and documentation to evolve without continually changing the security-critical multisig construction.**
+Bitcoin Core generates the keys, descriptors, and wallet databases. No custom cryptography is used.
 
-Neither architecture should be treated as professionally audited merely because it is easy to read. Core Multisig Minimal still recommends independent expert review before relying on it for substantial value.
+Because of the current Bitcoin Core descriptor-import behavior discussed in `bitcoin/bitcoin#35377`, the generator substitutes each signer's Core-derived xprv only into that signer's descriptor during import. Bitcoin Core still performs the key generation and derivation.
 
-## Change policy
+The implementation uses the upstream Bitcoin Core multisig wizard work as its primary reference, including `bitcoin/bitcoin#36325` and the related behavior discussed in `bitcoin/bitcoin#35377`.
 
-Treat `multisig.py` as the frozen, security-critical part of this project. Once it has been reviewed, it should not be changed for feature additions, user-interface changes, Tails changes, documentation changes, or convenience improvements. A change to `multisig.py` should be made only when Bitcoin Core behavior or the required wallet construction changes, and any such change should trigger a new review of the generator.
+A meaningful audit should include functional testing of wallet creation, address derivation, restoration, PSBT signing, and the intended M-of-N spending threshold.
 
-`tails.sh` is the environment and launcher layer. It may need occasional changes when Tails or Bitcoin Core startup/runtime behavior changes, without changing the multisig construction itself.
-
-`PRE-CREATION-GUIDE.txt` and `POST-CREATION-GUIDE.txt` are operational documentation and are expected to evolve independently of the generator. Routine operational wording should be changed there rather than in the generator.
-
-`README.md` is the project specification and audit boundary and should normally remain stable alongside `multisig.py`.
-
-For an audit, review an exact Git commit rather than an unfrozen branch.
-
-## Audit
-
-`multisig.py` is the generic Bitcoin Core multisig generator. It contains only the wallet-construction logic; Tails-specific safety, storage, and operating instructions are kept out of it to make the security-critical code easier to audit.
-
-`tails.sh` handles only the Tails environment, Bitcoin Core process/runtime setup and cleanup, and displaying the two static guide files with Zenity. Preparation instructions are in `PRE-CREATION-GUIDE.txt`; the post-generation procedure is in `POST-CREATION-GUIDE.txt`.
-
-The wallet is fixed to **Bitcoin mainnet**, BIP87 account path `m/87h/0h/0h`, and native SegWit `wsh(sortedmulti())` with receive/change derivation `/<0;1>/*`. Bitcoin Core generates the keys, descriptors, and wallet databases. No custom cryptography is used.
-
-`timestamp: 0` is intentional so restoration cannot miss wallet history because of an incorrect offline system clock. Because of the current Bitcoin Core descriptor-import behavior discussed in `bitcoin/bitcoin#35377`, the generator substitutes each signer's Core-derived xprv only into that signer's descriptor during import; Bitcoin Core still performs all key generation and derivation.
-
-The implementation uses the upstream Bitcoin Core multisig wizard work as its primary reference, including `bitcoin/bitcoin#36325` and the related Core behavior discussed in `bitcoin/bitcoin#35377`.
-
-The generator has received AI-assisted code review and safety testing, but it has **not** received an independent professional security audit. If you plan to rely on it for a wallet and that level of review does not satisfy you, having an experienced Bitcoin developer or security reviewer inspect `multisig.py` is strongly recommended.
-
-The generator is intentionally small and delegates the cryptographic and wallet primitives to Bitcoin Core, so an experienced reviewer should be able to inspect the relevant logic relatively quickly. A meaningful audit should still include functional testing of wallet creation, address derivation, restoration, PSBT signing, and the intended M-of-N spending threshold.
-
-If you review or audit the multisig generator, sharing the findings would be greatly appreciated. Help funding an independent audit is also welcome.
+If you review or audit the generator, sharing the findings would be greatly appreciated. Help funding an independent audit is also welcome.
