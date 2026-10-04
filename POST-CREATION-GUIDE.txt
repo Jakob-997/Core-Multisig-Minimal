@@ -32,6 +32,11 @@ Keep this computer and all backup media attended for the rest of this process.
 
 2. Verify every CD-R can be read and every wallet loads correctly.
 
+   A CD-R is read-only. When testing a backup, first copy the wallet folder from
+   the disc to a temporary writable location on the offline Tails session, then
+   load that copied wallet in Bitcoin Core. Do not try to run the wallet database
+   directly from the CD-R.
+
 3. Confirm every signer wallet and the watch-only wallet derive the same multisig
    receive addresses.
 
@@ -44,7 +49,8 @@ Keep this computer and all backup media attended for the rest of this process.
 
 4. Take ONLY the WATCH ONLY disc to your online computer.
 
-   On your fully synced, unpruned online Bitcoin Core node, restore/load the watch-only wallet.
+   Copy the watch_only folder from the CD-R to writable storage on your fully
+   synced, unpruned online Bitcoin Core computer, then load that copied wallet.
    Use this wallet to monitor the multisig and to create unsigned transactions/PSBTs.
 
    NEVER put a signer disc into the online computer.
