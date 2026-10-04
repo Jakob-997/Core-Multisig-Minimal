@@ -17,7 +17,8 @@ Home/
     │   └── bin/
     └── Core-Multisig-Minimal/
         ├── multisig.py
-        └── tails.sh
+        ├── tails.sh
+        └── POST-CREATION-GUIDE.txt
 ```
 
 If this will be a wallet you actually use, permanently air-gap the computer first. Remove its network card(s), including Wi-Fi/Bluetooth and any WWAN/cellular hardware if present, disconnect Ethernet, and never connect the computer to a network again.
@@ -37,63 +38,13 @@ Enter M-N (example 2-3):
 
 The script creates N signer wallets and 1 watch-only wallet directly inside `multisig-backups`. Bitcoin Core's separate runtime data is kept in a temporary RAM-backed directory and removed after generation.
 
-## Finished
-
-After generation, Bitcoin Core is stopped and the temporary runtime directory is removed. A GNOME instructions window then opens with the remaining backup, testing, shutdown, and storage steps. If the GNOME dialog is unavailable, the same instructions are printed in the Console instead.
-
-The wallet directory is:
-
-```text
-Core-Multisig-Minimal/
-├── multisig.py
-├── tails.sh
-└── multisig-backups/
-    ├── watch_only/
-    │   └── wallet.dat
-    ├── signer_1/
-    │   └── wallet.dat
-    ├── signer_2/
-    │   └── wallet.dat
-    └── ...
-```
-
-Each `signer_N` folder is a separate Bitcoin Core wallet containing that signer's private key and the multisig wallet information. The `watch_only` wallet contains no private signing key and is for watching the wallet and creating unsigned transactions.
-
-These wallets are **not encrypted**. Anyone who gets a signer wallet can copy that signer key, and anyone who gets any of these wallet directories can learn the public information needed to follow the multisig wallet on-chain. Keep enough signers physically separated so that one loss or theft does not compromise your M-N policy.
-
-If you plan to use CD-Rs, prepare **N + 1 blank discs** and label them before burning. For a 2-3 wallet, for example:
-
-```text
-SIGNER 1 OF 3 — PRIVATE
-SIGNER 2 OF 3 — PRIVATE
-SIGNER 3 OF 3 — PRIVATE
-WATCH ONLY — PUBLIC
-```
-
-Use **Brasero**, included with Tails, to burn each folder to its matching labeled disc:
-
-- `signer_1` → SIGNER 1
-- `signer_2` → SIGNER 2
-- continue through `signer_N`
-- `watch_only` → WATCH ONLY
-
-CD-R is a write-once format and is useful for durable offline storage when stored carefully. Keep each private signer disc in a separate secure location.
-
-**Do not fund the wallet until you have completed the entire test and backup process. Keep the computer and every backup disc attended from this point until the computer is powered off and the discs are stored.**
-
-Burn each signer folder and the watch-only folder to its matching labeled CD-R. Verify every disc can be read and that every wallet loads correctly. Confirm that every signer wallet and the watch-only wallet derive the same multisig receive addresses.
-
-Then perform a disposable **test spend**. Try signing with **every signer wallet** so you know every signer works, and confirm that the intended M-of-N threshold can complete the transaction.
-
-Once the test spend succeeds and every CD-R has been verified, **immediately shut the computer down and remove the Tails USB**. Do not leave the computer unattended before it has been fully powered off.
-
-Put each labeled CD-R in a protective, durable case, then take the discs **directly to their intended storage locations**. Do not leave the backup discs sitting around or unattended at any point in this process.
+After generation succeeds, Bitcoin Core is stopped, the temporary runtime directory is removed, and `POST-CREATION-GUIDE.txt` opens in GNOME Text Editor. Follow that guide continuously through burning, verification, test spending, shutdown, and storage.
 
 ## Audit
 
 `multisig.py` is the generic Bitcoin Core multisig generator. It contains only the wallet-construction logic; Tails-specific safety, storage, and operating instructions are kept out of it to make the security-critical code easier to audit.
 
-`tails.sh` handles the Tails environment, directs Bitcoin Core's wallet directory to `multisig-backups`, keeps the separate Core runtime/datadir in RAM, stops Core, removes that temporary runtime state, and presents the user-facing instructions.
+`tails.sh` handles only the Tails environment and Bitcoin Core process/runtime setup and cleanup. The post-generation human procedure is kept separately in `POST-CREATION-GUIDE.txt`.
 
 The wallet is fixed to BIP87 native SegWit `wsh(sortedmulti())`. Bitcoin Core generates the keys, descriptors, and wallet databases. No custom cryptography is used.
 
