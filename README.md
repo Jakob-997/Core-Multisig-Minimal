@@ -112,6 +112,8 @@ The generator is fixed to:
 
 Bitcoin Core generates the keys, descriptors, and wallet databases. No custom cryptography is used.
 
+The launcher resolves the Bitcoin Core binaries from the adjacent extracted Bitcoin Core folder and passes the exact `bitcoin-cli` path into `multisig.py`. CoreVault does not resolve `bitcoin-cli` or `bitcoind` from the user's `PATH`.
+
 `timestamp: 0` is intentional so restoration cannot miss wallet history because of an incorrect offline system clock.
 
 Because of the current Bitcoin Core descriptor-import behavior discussed in [bitcoin/bitcoin#35377](https://github.com/bitcoin/bitcoin/pull/35377), the generator substitutes each signer's Core-derived xprv only into that signer's descriptor during import. Bitcoin Core still performs the key generation and derivation.
