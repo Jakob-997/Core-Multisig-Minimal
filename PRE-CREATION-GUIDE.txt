@@ -3,9 +3,9 @@ PRE-CREATION GUIDE
 Before creating the wallet, confirm all of the following:
 
 [ ] I have verified the Tails ISO.
-[ ] I am working from the normal non-persistent Tails Home folder, not Persistent Storage or another writable disk.
+[ ] I am working in Home or Downloads in the normal non-persistent Tails session, not Persistent Storage or another writable disk.
 [ ] I am using Bitcoin Core v32.0rc2 and have verified the release and the release-signing key fingerprints I trust.
-[ ] The CoreVault folder is next to bitcoin-32.0rc2-x86_64-linux-gnu.tar.gz in my non-persistent Home folder; the tarball is still compressed.
+[ ] The CoreVault folder is next to bitcoin-32.0rc2-x86_64-linux-gnu.tar.gz in the same parent folder (Home or Downloads); the tarball is still compressed.
 [ ] I have physically air-gapped this computer by removing its network card(s) and will never connect it to a network again.
 [ ] I have N + 1 blank CD-Rs with me and they are already labeled for each signer and the watch-only wallet.
 [ ] I have protective cases ready for the finished discs.
@@ -52,7 +52,12 @@ PLACE THE TARBALL NEXT TO COREVAULT
 Download the official Linux x86_64 archive from:
 https://bitcoincore.org/bin/bitcoin-core-32.0/test.rc2/
 
-Home/
+Place the CoreVault folder next to the unextracted archive in the same parent
+folder. Home or Downloads both work in your non-persistent Tails session. The
+launcher finds the archive next to its own folder, wherever you launch it from.
+For example:
+
+Downloads/
     bitcoin-32.0rc2-x86_64-linux-gnu.tar.gz
     CoreVault/
         tails.sh
@@ -80,7 +85,7 @@ If execution is blocked (noexec), the launcher stops rather than using another
 installation. The extracted binaries and runtime state are removed on normal
 completion or a handled failure. Uncatchable termination or power loss cannot run
 cleanup. Wallet backups remain in CoreVault/multisig-backups; they are not deleted
-by cleanup. Keep CoreVault in non-persistent Home as required above.
+by cleanup. Keep CoreVault in non-persistent Home or Downloads as required above.
 
 PERMANENT AIR GAP
 
