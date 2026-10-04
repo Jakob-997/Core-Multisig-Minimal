@@ -3,6 +3,7 @@ PRE-CREATION GUIDE
 Before creating the wallet, confirm all of the following:
 
 [ ] I have verified the Tails ISO.
+[ ] I am working from the normal non-persistent Tails Home folder, not Persistent Storage or another writable disk.
 [ ] I have verified the Bitcoin Core release and the release-signing key fingerprints I trust.
 [ ] I have physically air-gapped this computer by removing its network card(s) and will never connect it to a network again.
 [ ] I have N + 1 blank CD-Rs with me and they are already labeled for each signer and the watch-only wallet.
