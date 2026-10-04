@@ -20,7 +20,9 @@ def import_descriptor(wallet, descriptor_body):
     checksum = rpc("getdescriptorinfo", descriptor_body)["checksum"]
     descriptor = f"{descriptor_body}#{checksum}"
     request = json.dumps([{"desc": descriptor, "active": True, "timestamp": 0}])
-    rpc("importdescriptors", request, wallet=wallet)
+    result = rpc("importdescriptors", request, wallet=wallet)[0]
+    if not result["success"]:
+        raise RuntimeError(result["error"]["message"])
 
 keys = []
 for number in range(1, signer_count + 1):
