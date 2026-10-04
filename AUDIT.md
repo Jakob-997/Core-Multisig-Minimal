@@ -6,7 +6,7 @@ This AI-assisted re-review covers the launcher change based on commit
 [`aae2e2a569845aeb62e037517237fe02162f1cc8`](https://github.com/Jakob-997/CoreVault/commit/aae2e2a569845aeb62e037517237fe02162f1cc8).
 The exact executable Git blob SHAs for this review are:
 
-- `tails.sh`: `9a8d639d9f0ba238b2d008502bd3fdc263b67ea7`
+- `tails.sh`: `06e8f2e6174c74035d5ff23531511a014337dd34`
 - `multisig.py`: `19f3988e32566f39e46c4feff1807175c17e06d4` — unchanged from the wallet-construction baseline.
 
 ### Trust flow and source of the pin
@@ -33,9 +33,14 @@ Replacing the original adjacent tarball after verification cannot substitute the
 bytes extracted. Failed copying, hashing, or extraction aborts before Core runs.
 There is no network fetch, configurable digest, or fallback binary location.
 Only absolute paths to `bitcoin-cli` and `bitcoind` inside the fresh extraction
-are used, including version probes, shutdown RPC, and the path passed to the
+are used, including startup, shutdown RPC, and the path passed to the
 unchanged generator. A pre-existing `bitcoin-32.0rc2` directory and Core binaries
 on `PATH` are ignored.
+
+The archive digest pins the complete release contents. The redundant version-string
+probes were removed, as was a repeated signal-trap registration. Executable-file
+checks and both phases of cleanup remain. The resulting launcher is two lines
+shorter than the previous adjacent-folder launcher, with no compressed shell logic.
 
 Runtime HOME remains in that private directory. Wallet backups remain at
 `CoreVault/multisig-backups`, outside temporary cleanup. An existing backup

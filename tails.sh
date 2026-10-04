@@ -27,22 +27,6 @@ if [ ! -x "$bitcoin_cli" ] || [ ! -x "$bitcoind_bin" ]; then
     exit 1
 fi
 
-case "$("$bitcoin_cli" -version 2>/dev/null)" in
-    *"Bitcoin Core RPC client version v32.0.0rc2"*) ;;
-    *)
-        echo "Cannot run verified Bitcoin Core v32.0rc2 bitcoin-cli. /dev/shm must allow execution."
-        exit 1
-        ;;
-esac
-
-case "$("$bitcoind_bin" -version 2>/dev/null)" in
-    *"Bitcoin Core daemon version v32.0.0rc2"*) ;;
-    *)
-        echo "Cannot run verified Bitcoin Core v32.0rc2 bitcoind. /dev/shm must allow execution."
-        exit 1
-        ;;
-esac
-
 zenity --text-info \
     --title="Pre-Creation Guide" \
     --filename="$here/PRE-CREATION-GUIDE.txt" \
@@ -75,7 +59,6 @@ cleanup() {
 }
 
 trap cleanup EXIT
-trap 'exit 1' HUP INT TERM
 
 stop_core
 mkdir "$backup_dir"

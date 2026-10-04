@@ -104,7 +104,7 @@ The generator is fixed to:
 
 Bitcoin Core generates the keys, descriptors, and wallet databases. No custom cryptography is used.
 
-The launcher runs `bitcoin-cli` and `bitcoind` only by absolute paths inside its fresh, hash-verified extraction under `/dev/shm`. It also checks that both report v32.0rc2 and passes that exact `bitcoin-cli` path into `multisig.py`. CoreVault never resolves either Core binary from the user's `PATH` or from a pre-existing extracted folder. The hardcoded archive digest, launcher, system utilities, and operating environment are part of this trust boundary.
+The launcher runs `bitcoin-cli` and `bitcoind` only by absolute paths inside its fresh, hash-verified extraction under `/dev/shm` and passes that exact `bitcoin-cli` path into `multisig.py`. The pinned archive digest authenticates the exact release contents, so separate version-string checks are unnecessary. CoreVault never resolves either Core binary from the user's `PATH` or from a pre-existing extracted folder. The hardcoded archive digest, launcher, system utilities, and operating environment are part of this trust boundary.
 
 `timestamp: 0` is intentional so restoration cannot miss wallet history because of an incorrect offline system clock.
 
