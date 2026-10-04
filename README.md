@@ -17,7 +17,7 @@ Download and verify Tails and Bitcoin Core before creating a wallet.
 >
 > The generator uses the new `addhdkey` and `derivehdkey` wallet RPCs. These RPCs are present in Bitcoin Core v32.0rc2 and absent from v31.0. Until another v32 release candidate or the final v32.0 release has been tested with this project, use v32.0rc2 exactly.
 
-Download CoreVault and the official Bitcoin Core v32.0rc2 **Linux x86_64** archive. Place the `CoreVault` folder next to the unextracted `bitcoin-32.0rc2-x86_64-linux-gnu.tar.gz` archive in the same parent folder. **Home or Downloads both work** in your normal, non-persistent Tails session. The launcher finds the archive next to its own folder, regardless of where you launch it from; no manual Bitcoin Core extraction is needed. For example:
+Download CoreVault and the official Bitcoin Core v32.0rc2 **Linux x86_64** archive. Place the `CoreVault` folder next to the unextracted `bitcoin-32.0rc2-x86_64-linux-gnu.tar.gz` archive in the same parent folder. **Any parent folder works**—Home, Downloads, or another folder. The launcher finds the archive next to its own folder, regardless of where you launch it from; no manual Bitcoin Core extraction is needed. For example:
 
 ```text
 Downloads/
@@ -53,6 +53,8 @@ The Console then starts Bitcoin Core and asks:
 ```text
 Enter M-N (example 2-3):
 ```
+
+For the intended offline Tails workflow, use non-persistent storage because backups are written inside the CoreVault folder.
 
 The script creates N signer wallets and 1 watch-only wallet directly inside `CoreVault/multisig-backups`. Bitcoin Core's verified extracted binaries and separate runtime data are kept in the temporary RAM-backed directory and removed after generation. Backups remain in the CoreVault folder.
 
