@@ -52,35 +52,4 @@ cleanup
 trap - EXIT HUP INT TERM
 export HOME="$original_home"
 
-instructions=$(cat <<'EOF'
-Finished.
-
-The "multisig-backups" folder in the directory you launched this from now contains
-one folder for each signer and one watch-only wallet.
-
-Keep this computer and all backup media attended for the rest of the process.
-
-1. Burn each signer folder and the watch-only folder to its matching labeled CD-R.
-2. Verify every CD-R can be read and every wallet loads correctly.
-3. Confirm every signer wallet and the watch-only wallet derive the same multisig addresses.
-4. Do a disposable test spend. Try signing with every signer wallet and confirm the
-   intended M-of-N threshold can complete the transaction.
-5. Once the CDs are verified and the test spend succeeds, immediately power off the
-   computer and remove the Tails USB.
-6. Put each labeled CD-R in a protective case and take it directly to its intended
-   storage location.
-
-The signer wallets are not encrypted. Anyone with a signer disc can copy that key.
-Do not leave the computer or backup discs unattended during this process.
-
-Finished. You can now close this window.
-EOF
-)
-
-if command -v zenity >/dev/null 2>&1; then
-    printf '%s\n' "$instructions" | zenity --text-info \
-        --title="Core Multisig Minimal — Finished" \
-        --width=700 --height=650 || true
-else
-    printf '\n%s\n' "$instructions"
-fi
+gnome-text-editor "$here/POST-CREATION-GUIDE.txt" >/dev/null 2>&1 &
