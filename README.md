@@ -1,6 +1,6 @@
 # Core Multisig Minimal
 
-Create an M-N Bitcoin Core multisig wallet with N separate signer wallets and one watch-only wallet. You choose the M-N policy at the start, and Bitcoin Core handles the key generation, BIP87 derivation, multisig descriptor, and wallet backups.
+Create an M-N Bitcoin Core multisig wallet with N separate signer wallets and one watch-only wallet. You choose the M-N policy at the start, and Bitcoin Core handles the key generation, BIP87 derivation, multisig descriptor, and wallet storage.
 
 The goal is a small, easy-to-audit multisig generator with as little custom wallet logic as possible.
 
@@ -32,14 +32,16 @@ To run it in Tails:
 A Console window opens and asks:
 
 ```text
-M-N (example 2-3):
+Enter M-N (example 2-3):
 ```
 
-The script creates N signer wallets and 1 watch-only wallet.
+The script creates N signer wallets and 1 watch-only wallet directly inside `multisig-backups`. Bitcoin Core's separate runtime data is kept in a temporary RAM-backed directory and removed after generation.
 
 ## Finished
 
-When generation finishes, close the Console window. In the same `Core-Multisig-Minimal` directory you launched the program from, you will now see a new folder:
+After generation, Bitcoin Core is stopped and the temporary runtime directory is removed. A GNOME instructions window then opens with the remaining backup, testing, shutdown, and storage steps. If the GNOME dialog is unavailable, the same instructions are printed in the Console instead.
+
+The wallet directory is:
 
 ```text
 Core-Multisig-Minimal/
@@ -57,7 +59,7 @@ Core-Multisig-Minimal/
 
 Each `signer_N` folder is a separate Bitcoin Core wallet containing that signer's private key and the multisig wallet information. The `watch_only` wallet contains no private signing key and is for watching the wallet and creating unsigned transactions.
 
-These backups are **not encrypted**. Anyone who gets a signer backup can copy that signer key, and anyone who gets any of these wallet backups can learn the public information needed to follow the multisig wallet on-chain. Store the signer backups accordingly and keep enough signers physically separated so that one loss or theft does not compromise your M-N policy.
+These wallets are **not encrypted**. Anyone who gets a signer wallet can copy that signer key, and anyone who gets any of these wallet directories can learn the public information needed to follow the multisig wallet on-chain. Keep enough signers physically separated so that one loss or theft does not compromise your M-N policy.
 
 If you plan to use CD-Rs, prepare **N + 1 blank discs** and label them before burning. For a 2-3 wallet, for example:
 
@@ -79,28 +81,26 @@ CD-R is a write-once format and is useful for durable offline storage when store
 
 **Do not fund the wallet until you have completed the entire test and backup process. Keep the computer and every backup disc attended from this point until the computer is powered off and the discs are stored.**
 
-Burn each signer folder and the watch-only folder to its matching labeled CD-R. Verify every disc can be read and that every wallet backup loads correctly. Confirm that every signer wallet and the watch-only wallet derive the same multisig receive addresses.
+Burn each signer folder and the watch-only folder to its matching labeled CD-R. Verify every disc can be read and that every wallet loads correctly. Confirm that every signer wallet and the watch-only wallet derive the same multisig receive addresses.
 
-Then perform a disposable **test spend**. Try signing with **every signer wallet** so you know every signer backup works, and confirm that the intended M-of-N threshold can complete the transaction.
+Then perform a disposable **test spend**. Try signing with **every signer wallet** so you know every signer works, and confirm that the intended M-of-N threshold can complete the transaction.
 
 Once the test spend succeeds and every CD-R has been verified, **immediately shut the computer down and remove the Tails USB**. Do not leave the computer unattended before it has been fully powered off.
 
 Put each labeled CD-R in a protective, durable case, then take the discs **directly to their intended storage locations**. Do not leave the backup discs sitting around or unattended at any point in this process.
 
-Bitcoin Core uses a temporary RAM-only working directory while the generator is running. Powering off Tails clears the remaining session state from RAM. The intended long-term copies are the verified backup discs.
-
 ## Audit
 
-`multisig.py` is the generic Bitcoin Core multisig generator. It contains the wallet-construction logic only; Tails-specific safety and operating instructions are kept out of it to make the code easier to audit.
+`multisig.py` is the generic Bitcoin Core multisig generator. It contains only the wallet-construction logic; Tails-specific safety, storage, and operating instructions are kept out of it to make the security-critical code easier to audit.
 
-`tails.sh` handles the Tails runtime environment, temporary RAM-only Bitcoin Core state, and the user-facing setup, backup, testing, shutdown, and storage instructions.
+`tails.sh` handles the Tails environment, directs Bitcoin Core's wallet directory to `multisig-backups`, keeps the separate Core runtime/datadir in RAM, stops Core, removes that temporary runtime state, and presents the user-facing instructions.
 
-The wallet is fixed to BIP87 native SegWit `wsh(sortedmulti())`. Bitcoin Core generates the keys, descriptors, and wallet backups. No custom cryptography is used.
+The wallet is fixed to BIP87 native SegWit `wsh(sortedmulti())`. Bitcoin Core generates the keys, descriptors, and wallet databases. No custom cryptography is used.
 
 The implementation uses the upstream Bitcoin Core multisig wizard work as its primary reference, including Bitcoin Core PR #36325 and the related Core behavior discussed in #35377.
 
 The generator has received AI-assisted code review and safety testing, but it has **not** received an independent professional security audit. If you plan to rely on it for a wallet and that level of review does not satisfy you, having an experienced Bitcoin developer or security reviewer inspect `multisig.py` is strongly recommended.
 
-The generator is intentionally small and delegates the cryptographic and wallet primitives to Bitcoin Core, so an experienced reviewer should be able to inspect the relevant logic relatively quickly. A meaningful audit should still include functional testing of wallet creation, address derivation, backup restoration, PSBT signing, and the intended M-of-N spending threshold.
+The generator is intentionally small and delegates the cryptographic and wallet primitives to Bitcoin Core, so an experienced reviewer should be able to inspect the relevant logic relatively quickly. A meaningful audit should still include functional testing of wallet creation, address derivation, restoration, PSBT signing, and the intended M-of-N spending threshold.
 
 If you review or audit the multisig generator, sharing the findings would be greatly appreciated. Help funding an independent audit is also welcome.
