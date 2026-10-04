@@ -52,4 +52,6 @@ cleanup
 trap - EXIT HUP INT TERM
 export HOME="$original_home"
 
-gnome-text-editor "$here/POST-CREATION-GUIDE.txt" >/dev/null 2>&1 &
+xdg-open "$here/POST-CREATION-GUIDE.txt" >/dev/null 2>&1 &
+
+printf '\nComplete. You may now close this window.\n'
