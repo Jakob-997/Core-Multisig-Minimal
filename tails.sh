@@ -12,13 +12,13 @@ open_guide() {
     guide="$1"
     opened=0
 
-    if command -v gio >/dev/null 2>&1; then
+    if command -v gnome-text-editor >/dev/null 2>&1; then
+        gnome-text-editor "$guide" >/dev/null 2>&1 &
+        opened=1
+    elif command -v gio >/dev/null 2>&1; then
         if gio open "$guide"; then
             opened=1
         fi
-    elif command -v gnome-text-editor >/dev/null 2>&1; then
-        gnome-text-editor "$guide" >/dev/null 2>&1 &
-        opened=1
     else
         echo "Could not open $(basename "$guide") automatically."
         echo "Open it manually from this folder."
