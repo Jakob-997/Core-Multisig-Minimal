@@ -8,6 +8,20 @@ bitcoin_bin=$(find "$here/.." -maxdepth 2 -type d -path '*/bitcoin-*/bin' -print
     exit 1
 }
 
+open_guide() {
+    guide="$1"
+    if command -v gio >/dev/null 2>&1; then
+        gio open "$guide" || true
+    elif command -v gnome-text-editor >/dev/null 2>&1; then
+        gnome-text-editor "$guide" >/dev/null 2>&1 &
+    else
+        echo "Could not open $(basename "$guide") automatically."
+        echo "Open it manually from this folder."
+    fi
+}
+
+open_guide "$here/PRE-CREATION-GUIDE.txt"
+
 backup_dir="$here/multisig-backups"
 
 original_home=$HOME
@@ -34,17 +48,6 @@ trap 'exit 1' HUP INT TERM
 stop_core
 mkdir "$backup_dir"
 
-cat <<'EOF'
-Create your M-N Bitcoin Core multisig wallet.
-
-Before continuing:
-- Make sure you verified the Tails ISO and the Bitcoin Core release before running this.
-  Verify Bitcoin Core's release signatures and independently verify the signer key
-  fingerprints you trust.
-- If this will be a wallet you actually use, permanently air-gap this computer:
-  remove its network card(s) and never connect it to a network again.
-EOF
-
 bitcoind -daemonwait -networkactive=0 -listen=0 -walletdir="$backup_dir"
 printf '\n'
 python3 multisig.py
@@ -53,15 +56,6 @@ cleanup
 trap - EXIT HUP INT TERM
 export HOME="$original_home"
 
-guide="$here/POST-CREATION-GUIDE.txt"
-
-if command -v gio >/dev/null 2>&1; then
-    gio open "$guide" || true
-elif command -v gnome-text-editor >/dev/null 2>&1; then
-    gnome-text-editor "$guide" >/dev/null 2>&1 &
-else
-    echo "Could not open POST-CREATION-GUIDE.txt automatically."
-    echo "Open it manually from this folder."
-fi
+open_guide "$here/POST-CREATION-GUIDE.txt"
 
 printf '\nComplete. You may now close this window.\n'
