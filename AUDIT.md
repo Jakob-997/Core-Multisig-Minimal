@@ -4,6 +4,10 @@
 
 This AI-assisted re-review covers the launcher change based on commit
 [`aae2e2a569845aeb62e037517237fe02162f1cc8`](https://github.com/Jakob-997/CoreVault/commit/aae2e2a569845aeb62e037517237fe02162f1cc8).
+**Merged executable snapshot:**
+[`5c205d6907c9d9f6acc417fb25423a40c274ffd7`](https://github.com/Jakob-997/CoreVault/commit/5c205d6907c9d9f6acc417fb25423a40c274ffd7).
+Documentation-only updates after this snapshot do not change the reviewed executables.
+
 The exact executable Git blob SHAs for this review are:
 
 - `tails.sh`: `e41685afa6e35d32a82a6b4379ce45245f6efc82`
