@@ -47,7 +47,9 @@ Treat `multisig.py` as the frozen, security-critical part of this project. Once 
 
 `tails.sh` is the environment and launcher layer. It may need occasional changes when Tails or Bitcoin Core startup/runtime behavior changes, without changing the multisig construction itself.
 
-`PRE-CREATION-GUIDE.txt` and `POST-CREATION-GUIDE.txt` are operational documentation and are expected to evolve independently of the generator.
+`PRE-CREATION-GUIDE.txt` and `POST-CREATION-GUIDE.txt` are operational documentation and are expected to evolve independently of the generator. Routine operational wording should be changed there rather than in the generator.
+
+`README.md` is the project specification and audit boundary and should normally remain stable alongside `multisig.py`.
 
 For an audit, review an exact Git commit rather than an unfrozen branch.
 
@@ -59,9 +61,9 @@ For an audit, review an exact Git commit rather than an unfrozen branch.
 
 The wallet is fixed to **Bitcoin mainnet**, BIP87 account path `m/87h/0h/0h`, and native SegWit `wsh(sortedmulti())` with receive/change derivation `/<0;1>/*`. Bitcoin Core generates the keys, descriptors, and wallet databases. No custom cryptography is used.
 
-`timestamp: 0` is intentional so restoration cannot miss wallet history because of an incorrect offline system clock. Because of the current Bitcoin Core descriptor-import behavior discussed in #35377, the generator substitutes each signer's Core-derived xprv only into that signer's descriptor during import; Bitcoin Core still performs all key generation and derivation.
+`timestamp: 0` is intentional so restoration cannot miss wallet history because of an incorrect offline system clock. Because of the current Bitcoin Core descriptor-import behavior discussed in `bitcoin/bitcoin#35377`, the generator substitutes each signer's Core-derived xprv only into that signer's descriptor during import; Bitcoin Core still performs all key generation and derivation.
 
-The implementation uses the upstream Bitcoin Core multisig wizard work as its primary reference, including Bitcoin Core PR #36325 and the related Core behavior discussed in #35377.
+The implementation uses the upstream Bitcoin Core multisig wizard work as its primary reference, including `bitcoin/bitcoin#36325` and the related Core behavior discussed in `bitcoin/bitcoin#35377`.
 
 The generator has received AI-assisted code review and safety testing, but it has **not** received an independent professional security audit. If you plan to rely on it for a wallet and that level of review does not satisfy you, having an experienced Bitcoin developer or security reviewer inspect `multisig.py` is strongly recommended.
 
