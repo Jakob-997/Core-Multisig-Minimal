@@ -6,7 +6,7 @@ The project has one central goal: **make multisig generation a small, repeatable
 
 ## Demo
 
-[Watch the updated CoreVault demo](https://github.com/Jakob-997/CoreVault/releases/download/v0.1.0-rc2/coreVault-latest-demo.mp4)
+https://github.com/user-attachments/assets/fae51512-3197-4d1b-b880-21e0152dc246
 
 ## Getting started
 
