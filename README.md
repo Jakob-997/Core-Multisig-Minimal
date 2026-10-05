@@ -2,6 +2,8 @@
 
 **Bitcoin Core multisig, reduced to a small procedure you can actually review.**
 
+Built with the **Bitcoin Core Feature Overlay** template.
+
 CoreVault creates an M-of-N native SegWit multisig wallet on an offline Tails computer. It produces one signer wallet per participant plus a watch-only wallet for receiving, monitoring, and creating unsigned PSBTs.
 
 ## Demo
@@ -47,4 +49,3 @@ Use **Bitcoin Core v32.0rc2 exactly**. Another Core release must be tested befor
 - [AUDIT.md](AUDIT.md) — exact reviewed revisions, findings, limitations, and upstream references
 - [PRE-CREATION-GUIDE.txt](PRE-CREATION-GUIDE.txt) — preparation checklist
 - [POST-CREATION-GUIDE.txt](POST-CREATION-GUIDE.txt) — backup, restore, GUI PSBT test spend, and storage procedure
-
